@@ -64,5 +64,7 @@
     <None Include="pool_allocator.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\LICENSE.md" />
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>
