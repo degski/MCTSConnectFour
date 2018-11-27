@@ -45,46 +45,12 @@
 
 #include "mcts.hpp"
 
-/*
-
-int wmain36476 ( ) {
-    boost::optional<Player> winner;
-    std::uint32_t matches = 0, agent_wins = 0, draws = 0;
-    putchar ( '\n' ); putchar ( ' ' );
-    g_clock.restart ( );
-    sf::Time elapsed, match_start;
-    // while ( true ) {
-    for ( index_t i = 0; i < 10; ++i ) {
-        {
-            ConnectFour < > state;
-            match_start = now ( );
-            do {
-                mcts::compute ( state, state.playerToMove ( ) == Player::type::agent ? 50'000 : 5'000 );
-            } while ( not ( winner = state.ended ( ) ) );
-        }
-        elapsed += since ( match_start );
-        ++matches;
-        switch ( winner.get ( ).as_index ( ) ) {
-            case ( index_t ) Player::type::agent: ++agent_wins; break;
-            case ( index_t ) Player::type::vacant: ++draws; break;
-            default:;
-        }
-        float c = ( ( ( float ) agent_wins + ( ( float ) draws * 0.5f ) ) / ( float ) matches ) * 1000.0f;
-        c = ( ( int ) c ) / 10.0f;
-        printf ( "\r  Match %i: Agent%6.1f%% - Human%6.1f%% (%.1f Sec./Match - %.1f Sec.) ", matches, c, 100.0f - c, elapsed.asSeconds ( ) / ( float ) matches, elapsed.asSeconds ( ) );
-    }
-
-    // std::cout << "\n\n Check " << ( ( g_rng ( ) == 8085774262754287791ULL ) ? "OK" : "BAD" ) << "\n\n";
-
-    return EXIT_SUCCESS;
-}
-*/
 
 int wmain ( ) {
 #if CF
     typedef ConnectFour<> State;
 #else
-    typedef OskaStateTemplate<4> State;
+    typedef OskaStateTemplate<5> State;
 #endif
     using Mcts = mcts::Mcts<State>;
     std::optional<Player> winner;
@@ -99,7 +65,7 @@ int wmain ( ) {
             match_start = now ( );
             do {
                 state.move_hash_winner ( state.playerToMove ( ) == Player::type::agent ? mcts_agent->compute ( state, 20'000 ) : mcts_human->compute ( state, 2'000 ) );
-                Mcts::reset ( state.playerToMove ( ) == Player::type::agent ? mcts_agent : mcts_human, state, state.playerToMove ( ) );
+                Mcts::prune ( state.playerToMove ( ) == Player::type::agent ? mcts_agent : mcts_human, state );
             } while ( not ( winner = state.ended ( ) ) );
 #if 0
             state.print ( );

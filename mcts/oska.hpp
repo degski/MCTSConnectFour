@@ -171,8 +171,8 @@ struct Move { // 4
 
 	enum class type : int8_t { LeftCapture = -2, LeftMove, None, RightMove, RightCapture, Invalid, UnInitialised, NoMove, RootMove };
 
-	union {
-		struct {
+	union { // Anonymous union ok.
+		struct { // Anonymous struct not ok.
 			Location m_from, m_to;
 		};
 		std::uint32_t v;
@@ -199,7 +199,6 @@ struct Move { // 4
 	}
 
 	bool isMove ( ) const noexcept {
-
 		return m_to.r - m_from.r == 1 and std::abs ( m_to.c - m_from.c ) == index_t ( 1 );
 	}
 

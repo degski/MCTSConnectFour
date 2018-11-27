@@ -57,7 +57,7 @@ namespace mcts {
 
     public:
 
-        Stack ( const T v_ ) noexcept {
+        Stack ( const T & v_ ) noexcept {
             m_data.reserve ( N );
             m_data.push_back ( v_ );
         }
@@ -66,7 +66,7 @@ namespace mcts {
             return m_data.pop ( );
         }
 
-        void push ( const T v_ ) noexcept {
+        void push ( const T & v_ ) noexcept {
             m_data.push_back ( v_ );
         }
 
@@ -83,7 +83,7 @@ namespace mcts {
 
     public:
 
-        Queue ( const T v_ ) noexcept {
+        Queue ( const T & v_ ) noexcept {
             m_data.push_back ( v_ );
         }
 
@@ -93,7 +93,7 @@ namespace mcts {
             return v;
         }
 
-        void push ( const T v_ ) noexcept {
+        void push ( const T & v_ ) noexcept {
             m_data.push_back ( v_ );
         }
 
@@ -619,14 +619,14 @@ namespace mcts {
             using Visited = typename Tree::Visited; // New m_nodes by old_index.
             using Stack = typename Tree::Stack;
             // Prune Tree.
-            const NodeID old_node = getNode ( state_.zobrist ( ) [ 0 ] );
+            const NodeID old_node = getNode ( state_.zobrist ( ) );
             Tree & new_tree = new_mcts_->m_tree;
-            new_mcts_->m_tree = Tree { std::move ( m_tree [ old_node ] ) };
+            new_tree [ new_tree.root_node ] = std::move ( m_tree [ old_node ] );
             // The Visited-vector stores the new NodeID's indexed by old NodeID's,
             // old NodeID's not present in the new tree have a value of NodeID::invalid.
             static Visited visited;
             visited.clear ( );
-            visited.resize ( m_tree.nodeNum ( ), Tree::NodeID::invalid );
+            visited.resize ( m_tree.nodesSize ( ), Tree::NodeID::invalid );
             visited [ old_node.value ] = new_tree.root_node;
             static Stack stack;
             stack.clear ( );
@@ -667,19 +667,22 @@ namespace mcts {
 
         public:
 
-        static void prune ( Mcts * & old_mcts_, const State & state_ ) noexcept {
-            if ( not ( old_mcts_->m_not_initialized ) and old_mcts_->getNode ( state_.zobrist ( ) [ 0 ] ) != Mcts::Tree::invalid_node ) {
+        static void prune ( Mcts * & mcts_, const State & state_ ) noexcept {
+            Mcts * pruned_mcts = new Mcts ( );
+            if ( not ( mcts_->m_not_initialized ) and Mcts::Tree::NodeID::invalid != mcts_->getNode ( state_.zobrist ( ) ) ) {
                 // The state exists in the tree and it's not the current
                 // root_node, i.e. now prune.
-                Mcts * new_mcts = new Mcts ( );
-                old_mcts_->prune_impl ( new_mcts, state_ );
-                std::swap ( old_mcts_, new_mcts );
-                delete new_mcts;
+                mcts_->prune_impl ( pruned_mcts, state_ );
             }
+            else {
+                mcts_->initialize ( state_ );
+            }
+            std::swap ( mcts_, pruned_mcts );
+            delete pruned_mcts;
         }
 
 
-        static void reset ( Mcts * & mcts_, const State & state_, const Player player_ ) noexcept {
+        static void reset ( Mcts * & mcts_, const State & state_ ) noexcept {
             if ( not ( mcts_->m_not_initialized ) ) {
                 const Mcts::NodeID new_root_node = mcts_->getNode ( state_.zobrist ( ) );
                 if ( Mcts::Tree::NodeID::invalid != new_root_node ) {
