@@ -114,8 +114,8 @@ public:
 	auto cend ( ) const noexcept { return m_path.cend ( ); }
 
 	void clear ( ) noexcept { m_path.clear ( ); }
-	void resize ( const size_t s_ ) noexcept { m_path.resize ( s_ ); }
-	void reserve ( const size_t s_ ) noexcept { m_path.reserve ( s_ ); }
+	void resize ( const std::size_t s_ ) noexcept { m_path.resize ( s_ ); }
+	void reserve ( const std::size_t s_ ) noexcept { m_path.reserve ( s_ ); }
 
 	void print ( ) const noexcept {
 

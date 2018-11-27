@@ -55,24 +55,19 @@ struct Move { // 1
 	Move ( Move && m_ ) noexcept : m_loc ( std::move ( m_.m_loc ) ) { }
 
 	Move & operator = ( const Move & rhs_ ) noexcept {
-
 		m_loc = rhs_.m_loc;
-
 		return *this;
 	}
 
 	bool operator == ( const Move & rhs_ ) const noexcept {
-
 		return m_loc == rhs_.m_loc;
 	}
 
 	bool operator != ( const Move & rhs_ ) const noexcept {
-
 		return m_loc != rhs_.m_loc;
 	}
 
 	void print ( ) const noexcept {
-
 		std::cout << ( int ) m_loc;
 	}
 
@@ -84,8 +79,12 @@ private:
 	void serialize ( Archive & ar_ ) { ar_ ( m_loc ); }
 };
 
+const Move Move::none = -1;
+const Move Move::root = -2;
+const Move Move::invalid = -3;
 
-template < size_t NumRows = 6, size_t NumCols = 7 >
+
+template < std::size_t NumRows = 6, std::size_t NumCols = 7 >
 class ConnectFour {
 
 public:
@@ -94,7 +93,7 @@ public:
 
 	typedef ma::MatrixCM < Player, NumRows, NumCols > Board;
 
-	typedef uint64_t ZobristHash;
+	typedef std::uint64_t ZobristHash;
 	typedef ma::Cube < ZobristHash, 2, NumRows, NumCols > ZobristHashKeys; // 2 players, 0 based...
 
 	typedef Move Move;
@@ -272,17 +271,17 @@ public:
 	}
 
 
-	inline void move_hash ( const Move move_ ) noexcept {
+	void move_hash ( const Move move_ ) noexcept {
 
 		hash ( move ( move_ ) );
 	}
 
-	inline void move_hash_winner ( const Move move_ ) noexcept {
+	void move_hash_winner ( const Move move_ ) noexcept {
 
 		winner ( hash ( move ( move_ ) ) );
 	}
 
-	inline void move_winner ( const Move move_ ) noexcept {
+	void move_winner ( const Move move_ ) noexcept {
 
 		winner ( move ( move_ ) );
 	}
@@ -294,7 +293,7 @@ public:
 	}
 
 
-	[ [ maybe_unused ] ] inline bool moves ( Moves * m_ ) const noexcept {
+	[ [ maybe_unused ] ] bool moves ( Moves * m_ ) const noexcept {
 
 		m_->clear ( );
 
@@ -326,7 +325,7 @@ public:
 	}
 
 
-	inline float result ( const Player player_just_moved_ ) const noexcept {
+	float result ( const Player player_just_moved_ ) const noexcept {
 
 		// Determine result: last player of path is the player to move...
 
@@ -336,9 +335,9 @@ public:
 	}
 
 
-	std::optional < Player > ended ( ) const noexcept {
+	std::optional<Player> ended ( ) const noexcept {
 
-		return m_winner == Player::type::invalid ? std::optional < Player > ( ) : std::optional < Player > ( m_winner );
+		return m_winner == Player::type::invalid ? std::optional<Player> ( ) : std::optional<Player> ( m_winner );
 	}
 
 
@@ -433,7 +432,7 @@ private:
 
 }; // __attribute__ ( ( packed ) );
 
-template < size_t NumRows, size_t NumCols >
+template < std::size_t NumRows, std::size_t NumCols >
 const typename ConnectFour < NumRows, NumCols >::ZobristHashKeys ConnectFour < NumRows, NumCols >::m_zobrist_keys {
 
 	0xa1a656cb9731c5d5ull, 0xc3dce6ad6465ea7aull, 0x9e2556e2bbec18d3ull, 0x900670630f4f76afull,
@@ -459,13 +458,13 @@ const typename ConnectFour < NumRows, NumCols >::ZobristHashKeys ConnectFour < N
 	0xcd5f48e9ac464398ull, 0xfcc2df3237564c0cull, 0x1ea8202ddf77efdeull, 0x000617fafba044adull
 };
 
-template < size_t NumRows, size_t NumCols >
+template < std::size_t NumRows, std::size_t NumCols >
 const typename ConnectFour < NumRows, NumCols >::ZobristHash ConnectFour < NumRows, NumCols >::m_zobrist_player_key_values [ 3 ] {
 
 	0x41fec34015a1bef2ull, 0x8b80677c9c144514ull, 0xf6242292160d5bb7ull
 };
 
-template < size_t NumRows, size_t NumCols >
+template < std::size_t NumRows, std::size_t NumCols >
 const typename ConnectFour < NumRows, NumCols >::ZobristHash * ConnectFour < NumRows, NumCols >::m_zobrist_player_keys {
 
 	m_zobrist_player_key_values + 1

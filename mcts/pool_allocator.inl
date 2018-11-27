@@ -34,7 +34,7 @@ namespace pa {
 	namespace detail {
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::size_type
+		typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::size_type
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::pad_pointer ( const DataPtr p_, const size_type align_ )
 			const noexcept
 		{
@@ -213,7 +213,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::pointer
+		typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::pointer
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::allocate ( size_type n_, const_pointer hint_ )
 		{
 			if ( m_free_slots != nullptr ) {
@@ -239,7 +239,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline void
+		void
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::deallocate ( pointer p_, size_type n_ )
 		{
 			if ( p_ != nullptr ) {
@@ -330,7 +330,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPointer
+		typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPointer
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::first_slot ( const SlotPointer block_ )
 			const noexcept
 		{
@@ -341,7 +341,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPointer
+		typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPointer
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::last_slot ( const SlotPointer block_ )
 			const noexcept
 		{
@@ -371,7 +371,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPtrVector
+		typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPtrVector
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::block_vector ( )
 			const noexcept
 		{
@@ -381,7 +381,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPointer
+		typename chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::SlotPointer
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::virtual_alloc ( const size_type size_ )
 			const noexcept
 		{
@@ -391,7 +391,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t ChunkCount, std::size_t PageSize, std::size_t MinAlloc>
-		inline void
+		void
 			chunk_pool_allocator<T, ChunkCount, PageSize, MinAlloc>::virtual_free ( const SlotPointer block_ )
 			const noexcept
 		{
@@ -401,7 +401,7 @@ namespace pa {
 
 		template<typename T, std::size_t PageSize, std::size_t MinAlloc>
 		template<typename U, typename ... Args>
-		inline void
+		void
 			node_pool_allocator<T, PageSize, MinAlloc>::construct ( U* p_, Args && ... args_ )
 		{
 			new ( p_ ) U ( std::forward<Args> ( args_ )... );
@@ -411,7 +411,7 @@ namespace pa {
 
 		template<typename T, std::size_t PageSize, std::size_t MinAlloc>
 		template<typename U>
-		inline void
+		void
 			node_pool_allocator<T, PageSize, MinAlloc>::destroy ( U *p_ )
 		{
 			if constexpr ( std::negation<std::is_trivially_destructible<T>>::value ) {
@@ -424,7 +424,7 @@ namespace pa {
 
 		template<typename T, std::size_t PageSize, std::size_t MinAlloc>
 		template<typename ... Args>
-		inline typename node_pool_allocator<T, PageSize, MinAlloc>::pointer
+		typename node_pool_allocator<T, PageSize, MinAlloc>::pointer
 			node_pool_allocator<T, PageSize, MinAlloc>::new_element ( Args && ... args_ )
 		{
 			pointer result = base_allocator_type::allocate ( );
@@ -435,7 +435,7 @@ namespace pa {
 
 
 		template<typename T, std::size_t PageSize, std::size_t MinAlloc>
-		inline void
+		void
 			node_pool_allocator<T, PageSize, MinAlloc>::delete_element ( pointer p_ )
 		{
 			if ( p_ != nullptr ) {

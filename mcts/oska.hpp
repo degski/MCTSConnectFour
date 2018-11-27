@@ -175,7 +175,7 @@ struct Move { // 4
 		struct {
 			Location m_from, m_to;
 		};
-		uint32_t v;
+		std::uint32_t v;
 	};
 
 	Move ( ) noexcept : v ( invalid.v )  { }
@@ -198,12 +198,12 @@ struct Move { // 4
 		return v != rhs_.v;
 	}
 
-	inline bool isMove ( ) const noexcept {
+	bool isMove ( ) const noexcept {
 
 		return m_to.r - m_from.r == 1 and std::abs ( m_to.c - m_from.c ) == index_t ( 1 );
 	}
 
-	inline bool isCapture ( ) const noexcept {
+	bool isCapture ( ) const noexcept {
 		return m_to.r - m_from.r == 2 and std::abs ( m_to.c - m_from.c ) == index_t ( 2 );
 	}
 
@@ -218,6 +218,10 @@ private:
 	template < class Archive >
 	void serialize ( Archive & ar_ ) { ar_ ( v ); }
 };
+
+const Move Move::none = Move ( Location ( -1, -1 ), Location ( -1, -1 ) );
+const Move Move::root = Move ( Location ( -2, -2 ), Location ( -2, -2 ) );
+const Move Move::invalid;
 
 
 #define NO_COLS( S ) ( S )
@@ -440,7 +444,7 @@ public:
 			}
 		}
 
-		std::uniform_int_distribution < size_t > dist;
+		std::uniform_int_distribution < std::size_t > dist;
 
 		// Top of the board...
 
@@ -585,17 +589,17 @@ public:
 		m_last_move = Move::root;
 	}
 
-	inline bool isValidID ( const int8_t id_ ) const noexcept {
+	bool isValidID ( const int8_t id_ ) const noexcept {
 
 		return id_ >= 0 and id_ < NO_HEXAGONS ( S );
 	}
 
-	inline PointArray toArray ( const sf::Vector2f & v_ ) const noexcept {
+	PointArray toArray ( const sf::Vector2f & v_ ) const noexcept {
 
 		return * reinterpret_cast < const PointArray * > ( & v_ );
 	}
 
-	inline sf::Vector2f fromArray ( const PointArray & p_ ) const noexcept {
+	sf::Vector2f fromArray ( const PointArray & p_ ) const noexcept {
 
 		return * reinterpret_cast < const sf::Vector2f * > ( & p_ );
 	}
@@ -622,54 +626,54 @@ public:
 		return id;
 	}
 
-	inline Hexagon & getHexRefFromID ( const index_t i_ ) noexcept {
+	Hexagon & getHexRefFromID ( const index_t i_ ) noexcept {
 
 		return m_hexagons.at ( i_ );
 	}
 
-	inline index_t getIdFromLocation ( const Location & l_ ) const noexcept {
+	index_t getIdFromLocation ( const Location & l_ ) const noexcept {
 
 		// Agents' view...
 
 		return m_location_to_id.at ( l_.c, l_.r );
 	}
 
-	inline StoneID & getAgentStoneIDs ( ) noexcept {
+	StoneID & getAgentStoneIDs ( ) noexcept {
 
 		return m_agent_stone_id;
 	}
 
-	inline StoneID & getHumanStoneIDs ( ) noexcept {
+	StoneID & getHumanStoneIDs ( ) noexcept {
 
 		return m_human_stone_id;
 	}
 
-	inline bool haveStones ( const Player player_ ) const noexcept {
+	bool haveStones ( const Player player_ ) const noexcept {
 
 		return player_ == Player::type::agent ? m_agent_stone_id.size ( ) : m_human_stone_id.size ( );
 	}
 
-	inline bool notHaveStones ( const Player player_ ) const noexcept {
+	bool notHaveStones ( const Player player_ ) const noexcept {
 
 		return player_ == Player::type::agent ? m_agent_stone_id.empty ( ) : m_human_stone_id.empty ( );
 	}
 
-	inline bool haveRemainingHome ( const Player player_ ) const noexcept {
+	bool haveRemainingHome ( const Player player_ ) const noexcept {
 
 		return player_ == Player::type::agent ? ( m_no_home_agent and ( m_no_home_agent == m_agent_stone_id.size ( ) ) ) : ( m_no_home_human and ( m_no_home_human == m_human_stone_id.size ( ) ) );
 	}
 
-	inline ZobristHash zobrist ( ) const noexcept {
+	ZobristHash zobrist ( ) const noexcept {
 
 		return m_zobrist_hash ^ m_zobrist_player_keys [ m_player_to_move.as_index ( ) ]; // m_player_to_move is opposite player, doesn't matter for the ZH...
 	}
 
-	inline Player playerToMove ( ) const noexcept {
+	Player playerToMove ( ) const noexcept {
 
 		return m_player_to_move;
 	}
 
-	inline Player playerJustMoved ( ) const noexcept {
+	Player playerJustMoved ( ) const noexcept {
 
 		return m_player_to_move.opponent ( );
 	}
@@ -709,7 +713,7 @@ private:
 
 public:
 
-	inline Location other ( const Location & l_ ) const noexcept {
+	Location other ( const Location & l_ ) const noexcept {
 
 		return Location ( ( OB_COLS ( S ) - 1 ), ( OB_ROWS ( S ) - 1 ) ) - l_;
 	}
@@ -857,7 +861,7 @@ private:
 
 	// Do Player's Move...
 
-	inline void moveStoneHash ( const Player player_, const Move & move_ ) noexcept {
+	void moveStoneHash ( const Player player_, const Move & move_ ) noexcept {
 
 		if ( player_ == Player::type::agent ) {
 
@@ -880,7 +884,7 @@ private:
 		}
 	}
 
-	inline void captureStoneHash ( const Player player_, const Move & move_ ) noexcept {
+	void captureStoneHash ( const Player player_, const Move & move_ ) noexcept {
 
 		const Location captured = move_.captured ( );
 
@@ -900,7 +904,7 @@ private:
 	}
 
 
-	inline void moveStone ( const Player player_, const Move & move_ ) noexcept {
+	void moveStone ( const Player player_, const Move & move_ ) noexcept {
 
 		if ( player_ == Player::type::agent ) {
 
@@ -919,7 +923,7 @@ private:
 		}
 	}
 
-	inline void captureStone ( const Player player_, const Move & move_ ) noexcept {
+	void captureStone ( const Player player_, const Move & move_ ) noexcept {
 
 		const Location captured = move_.captured ( );
 
@@ -1162,12 +1166,12 @@ public:
 		return false;
 	}
 
-	inline bool hasNoMoves ( const Player player_ ) const noexcept {
+	bool hasNoMoves ( const Player player_ ) const noexcept {
 
 		return not ( hasMoves ( player_ ) );
 	}
 
-	inline Player playerMostHomeStones ( ) const noexcept {
+	Player playerMostHomeStones ( ) const noexcept {
 
 		if ( m_no_home_agent > m_no_home_human ) return Player::type::agent;
 		if ( m_no_home_agent < m_no_home_human ) return Player::type::human;
@@ -1176,14 +1180,14 @@ public:
 	}
 
 
-	std::optional < Player > ended ( ) const noexcept {
+	std::optional<Player> ended ( ) const noexcept {
 
 		// Game ends, when:
 		//
 		// 1. m_player_that_moved moved all his stones in the end row;
 		// 2. player_to_move cannot move (this includes: player_to_move has no stones left);
 
-		return m_winner == Player::type::invalid ? std::optional < Player > ( ) : std::optional < Player > ( m_winner );
+		return m_winner == Player::type::invalid ? std::optional<Player> ( ) : std::optional<Player> ( m_winner );
 	}
 
 
@@ -1207,7 +1211,7 @@ public:
 
 
 
-	inline float result ( const Player player_just_moved_ ) const noexcept {
+	float result ( const Player player_just_moved_ ) const noexcept {
 
 		// Determine result: last player of path is the player to move...
 
@@ -1354,7 +1358,7 @@ namespace os {
 		function < void ( const Move & ) > m_move_hash_winner;
 		function < void ( ) > m_simulate;
 		function < float ( const Player ) > m_result;
-		function < boost::optional < Player > ( ) > m_ended;
+		function < boost::optional<Player> ( ) > m_ended;
 		function < void ( ) > m_print;
 
 		template<index_t S>
@@ -1455,27 +1459,27 @@ namespace os {
 			m_initialize ( );
 		}
 
-		inline void initialize ( ) const noexcept { m_initialize ( ); }
-		inline Location other ( const Location & l_ ) const noexcept { return m_other ( l_ ); }
-		inline bool isValidID ( const int8_t id_ ) const noexcept { return m_is_valid_id ( id_ ); }
-		inline index_t pointToHumanID ( const Point & p_ ) const noexcept { return m_point_to_human_id ( p_ ); }
-		inline index_t pointToHexID ( const Point & p_ ) const noexcept { return m_point_to_hex_id ( p_ ); }
-		inline Hexagon & getHexRefFromID ( const index_t i_ ) noexcept { return m_get_hex_ref_from_id ( i_ ); }
-		inline index_t getIdFromLocation ( const Location & l_ ) const noexcept { return m_get_id_from_location ( l_ ); }
-		inline StoneID & getAgentStoneIDs ( ) noexcept { return m_get_agent_stone_id ( ); }
-		inline StoneID & getHumanStoneIDs ( ) noexcept { return m_get_human_stone_id ( ); }
-		inline Move const humanMove ( const index_t f_, const index_t t_ ) const noexcept { return m_human_move ( f_, t_ ); }
-		inline Move lastMove ( ) const noexcept { return m_last_move ( ); }
-		inline ZobristHash zobrist ( ) const noexcept { return m_zobrist ( ); }
-		inline Player playerToMove ( ) const noexcept { return m_player_to_move ( ); }
-		inline Player playerJustMoved ( ) const noexcept { return m_player_to_move ( ).opponent ( ); }
-		inline bool moves ( Moves * moves_ ) const noexcept { return m_moves ( moves_ ); }
-		inline void move_hash ( const Move & move_ ) noexcept { return m_move_hash ( move_ ); }
-		inline void move_hash_winner ( const Move & move_ ) noexcept { return m_move_hash_winner ( move_ ); }
-		inline void simulate ( ) noexcept { m_simulate ( ); }
-		inline float result ( const Player player_ ) const noexcept { return m_result ( player_ ); }
-		inline boost::optional < Player > ended ( ) const noexcept { return m_ended ( ); }
-		inline void print ( ) const noexcept { return m_print ( ); }
+		void initialize ( ) const noexcept { m_initialize ( ); }
+		Location other ( const Location & l_ ) const noexcept { return m_other ( l_ ); }
+		bool isValidID ( const int8_t id_ ) const noexcept { return m_is_valid_id ( id_ ); }
+		index_t pointToHumanID ( const Point & p_ ) const noexcept { return m_point_to_human_id ( p_ ); }
+		index_t pointToHexID ( const Point & p_ ) const noexcept { return m_point_to_hex_id ( p_ ); }
+		Hexagon & getHexRefFromID ( const index_t i_ ) noexcept { return m_get_hex_ref_from_id ( i_ ); }
+		index_t getIdFromLocation ( const Location & l_ ) const noexcept { return m_get_id_from_location ( l_ ); }
+		StoneID & getAgentStoneIDs ( ) noexcept { return m_get_agent_stone_id ( ); }
+		StoneID & getHumanStoneIDs ( ) noexcept { return m_get_human_stone_id ( ); }
+		Move const humanMove ( const index_t f_, const index_t t_ ) const noexcept { return m_human_move ( f_, t_ ); }
+		Move lastMove ( ) const noexcept { return m_last_move ( ); }
+		ZobristHash zobrist ( ) const noexcept { return m_zobrist ( ); }
+		Player playerToMove ( ) const noexcept { return m_player_to_move ( ); }
+		Player playerJustMoved ( ) const noexcept { return m_player_to_move ( ).opponent ( ); }
+		bool moves ( Moves * moves_ ) const noexcept { return m_moves ( moves_ ); }
+		void move_hash ( const Move & move_ ) noexcept { return m_move_hash ( move_ ); }
+		void move_hash_winner ( const Move & move_ ) noexcept { return m_move_hash_winner ( move_ ); }
+		void simulate ( ) noexcept { m_simulate ( ); }
+		float result ( const Player player_ ) const noexcept { return m_result ( player_ ); }
+		boost::optional<Player> ended ( ) const noexcept { return m_ended ( ); }
+		void print ( ) const noexcept { return m_print ( ); }
 	};
 }
 

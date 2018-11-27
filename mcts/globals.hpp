@@ -33,9 +33,12 @@
 #include <cereal/archives/binary.hpp>
 #include <lz4stream.hpp>
 
+#include <SFML/Graphics.hpp>
+
 #include "splitmix.hpp"
 
 #define NO_DEFAULT_CASE default: abort ( )
+
 
 // C++ global constants have static linkage. This is different from C. If you try to use a global
 // constant in C++ in multiple files you get an unresolved external error. The compiler optimizes
@@ -45,73 +48,58 @@
 // non-constant and use a constant reference when assessing it.
 
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
-extern fs::path & g_app_data_path; // This needs to be in header file...
+extern fs::path & g_app_data_path; // This needs to be in header file.
 extern fs::path & g_app_path;
-
-
-#include <SFML/Graphics.hpp>
 
 extern sf::Clock g_clock;
 
-typedef splitmix64 rng_t;
+using rng_t = splitmix64;
 
-extern uint64_t g_seed;
+extern std::uint64_t g_seed;
 extern rng_t g_rng;
 
-uint64_t next_seed ( ) noexcept;
-void seed ( const uint64_t seed_ ) noexcept;
+[[ nodiscard ]] std::uint64_t next_seed ( ) noexcept;
+void seed ( const std::uint64_t seed_ ) noexcept;
 
-bool bernoulli ( ) noexcept;
+[[ nodiscard ]] bool bernoulli ( ) noexcept;
 
-extern int32_t g_max;
+extern std::int32_t g_max;
 
-inline sf::Time now ( ) noexcept {
-
-	return g_clock.getElapsedTime ( );
+[[ nodiscard ]] sf::Time now ( ) noexcept {
+    return g_clock.getElapsedTime ( );
 }
 
-inline sf::Time since ( const sf::Time start_ ) noexcept {
-
-	return g_clock.getElapsedTime ( ) - start_;
+[[ nodiscard ]] sf::Time since ( const sf::Time start_ ) noexcept {
+    return g_clock.getElapsedTime ( ) - start_;
 }
 
 
-inline void sleep ( const sf::Int32 milliseconds_ ) noexcept {
-
-	std::this_thread::sleep_for ( std::chrono::milliseconds ( milliseconds_ ) );
+void sleep ( const sf::Int32 milliseconds_ ) noexcept {
+    std::this_thread::sleep_for ( std::chrono::milliseconds ( milliseconds_ ) );
 }
 
-int32_t getNumberOfProcessors ( ) noexcept;
+std::int32_t getNumberOfProcessors ( ) noexcept;
 
 
-template < typename T >
+template<typename T>
 void saveToFile ( const T & t_, std::string && file_name_ ) noexcept {
-
-	std::ofstream compressed_ostream ( g_app_data_path / ( file_name_ + std::string ( ".lz4cereal" ) ), std::ios::binary );
-	LZ4OutputStream lz4_ostream ( compressed_ostream );
-
-	cereal::BinaryOutputArchive archive ( lz4_ostream );
-
-	archive ( t_ );
-
-	lz4_ostream.flush ( );
-	compressed_ostream.flush ( );
-
-	lz4_ostream.close ( );
-	compressed_ostream.close ( );
+    std::ofstream compressed_ostream ( g_app_data_path / ( file_name_ + std::string ( ".lz4cereal" ) ), std::ios::binary );
+    LZ4OutputStream lz4_ostream ( compressed_ostream );
+    cereal::BinaryOutputArchive archive ( lz4_ostream );
+    archive ( t_ );
+    lz4_ostream.flush ( );
+    compressed_ostream.flush ( );
+    lz4_ostream.close ( );
+    compressed_ostream.close ( );
 }
 
-template < typename T >
+template<typename T>
 void loadFromFile ( T & t_, std::string && file_name_ ) noexcept {
-
-	std::ifstream compressed_istream ( g_app_data_path / ( file_name_ + std::string ( ".lz4cereal" ) ), std::ios::binary );
-	LZ4InputStream lz4_istream ( compressed_istream );
-
-	cereal::BinaryInputArchive archive ( lz4_istream );
-
-	archive ( t_ );
-
-	compressed_istream.close ( );
+    std::ifstream compressed_istream ( g_app_data_path / ( file_name_ + std::string ( ".lz4cereal" ) ), std::ios::binary );
+    LZ4InputStream lz4_istream ( compressed_istream );
+    cereal::BinaryInputArchive archive ( lz4_istream );
+    archive ( t_ );
+    compressed_istream.close ( );
 }

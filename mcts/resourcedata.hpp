@@ -32,10 +32,10 @@
 #include "resource.h"
 
 
-enum class Screen : int32_t { SMALL, MEDIUM, LARGE };
+enum class Screen : std::int32_t { SMALL, MEDIUM, LARGE };
 
 
-template < int32_t S >
+template < std::int32_t S >
 struct ResourceDataTemplate {
 
 };
@@ -53,16 +53,16 @@ struct ResourceDataTemplate<4> {
 
 	const float m_margin = 30.0f;
 
-	const int32_t m_bg_png_small  = BOARD_BACKGROUND_W4_SMALL;
-	const int32_t m_bg_png_medium = BOARD_BACKGROUND_W4_MEDIUM;
-	const int32_t m_bg_png_large  = BOARD_BACKGROUND_W4_LARGE;
+	const std::int32_t m_bg_png_small  = BOARD_BACKGROUND_W4_SMALL;
+	const std::int32_t m_bg_png_medium = BOARD_BACKGROUND_W4_MEDIUM;
+	const std::int32_t m_bg_png_large  = BOARD_BACKGROUND_W4_LARGE;
 
-	const int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
 };
 
 template<>
@@ -78,16 +78,16 @@ struct ResourceDataTemplate<5> {
 
 	const float m_margin = 30.0f;
 
-	const int32_t m_bg_png_small  = BOARD_BACKGROUND_W5_SMALL;
-	const int32_t m_bg_png_medium = BOARD_BACKGROUND_W5_MEDIUM;
-	const int32_t m_bg_png_large  = BOARD_BACKGROUND_W5_LARGE;
+	const std::int32_t m_bg_png_small  = BOARD_BACKGROUND_W5_SMALL;
+	const std::int32_t m_bg_png_medium = BOARD_BACKGROUND_W5_MEDIUM;
+	const std::int32_t m_bg_png_large  = BOARD_BACKGROUND_W5_LARGE;
 
-	const int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
 };
 
 template<>
@@ -103,16 +103,16 @@ struct ResourceDataTemplate<6> {
 
 	const float m_margin = 30.0f;
 
-	const int32_t m_bg_png_small  = BOARD_BACKGROUND_W6_SMALL;
-	const int32_t m_bg_png_medium = BOARD_BACKGROUND_W6_MEDIUM;
-	const int32_t m_bg_png_large  = BOARD_BACKGROUND_W6_LARGE;
+	const std::int32_t m_bg_png_small  = BOARD_BACKGROUND_W6_SMALL;
+	const std::int32_t m_bg_png_medium = BOARD_BACKGROUND_W6_MEDIUM;
+	const std::int32_t m_bg_png_large  = BOARD_BACKGROUND_W6_LARGE;
 
-	const int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
 };
 
 template<>
@@ -128,16 +128,16 @@ struct ResourceDataTemplate<7> {
 
 	const float m_margin = 30.0f;
 
-	const int32_t m_bg_png_small  = BOARD_BACKGROUND_W7_SMALL;
-	const int32_t m_bg_png_medium = BOARD_BACKGROUND_W7_MEDIUM;
-	const int32_t m_bg_png_large  = BOARD_BACKGROUND_W7_LARGE;
+	const std::int32_t m_bg_png_small  = BOARD_BACKGROUND_W7_SMALL;
+	const std::int32_t m_bg_png_medium = BOARD_BACKGROUND_W7_MEDIUM;
+	const std::int32_t m_bg_png_large  = BOARD_BACKGROUND_W7_LARGE;
 
-	const int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
 };
 
 template<>
@@ -153,22 +153,22 @@ struct ResourceDataTemplate<8> { // Not done yet
 
 	const float m_margin = 30.0f;
 
-	const int32_t m_bg_png_small  = BOARD_BACKGROUND_W8_SMALL;
-	const int32_t m_bg_png_medium = BOARD_BACKGROUND_W8_MEDIUM;
-	const int32_t m_bg_png_large  = BOARD_BACKGROUND_W8_LARGE;
+	const std::int32_t m_bg_png_small  = BOARD_BACKGROUND_W8_SMALL;
+	const std::int32_t m_bg_png_medium = BOARD_BACKGROUND_W8_MEDIUM;
+	const std::int32_t m_bg_png_large  = BOARD_BACKGROUND_W8_LARGE;
 
-	const int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
-	const int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
-	const int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_small = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_small = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_medium = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_medium = HUMAN_STONE_W8_LARGE;
+	const std::int32_t m_as_png_large = AGENT_STONE_W8_LARGE;
+	const std::int32_t m_hs_png_large = HUMAN_STONE_W8_LARGE;
 };
 
 
 struct ResourceData {
 
-	enum class Type : int32_t { XARA_DIM_4, XARA_DIM_5, XARA_DIM_6, XARA_DIM_7, XARA_DIM_8 };
+	enum class Type : std::int32_t { XARA_DIM_4, XARA_DIM_5, XARA_DIM_6, XARA_DIM_7, XARA_DIM_8 };
 
 	Type m_type;
 
@@ -186,9 +186,9 @@ public:
 
 	float m_margin;
 
-	int32_t m_bg_png, m_as_png, m_hs_png;
+	std::int32_t m_bg_png, m_as_png, m_hs_png;
 
-	ResourceData ( const int32_t no_stones_  ) :
+	ResourceData ( const std::int32_t no_stones_  ) :
 
 		m_type ( static_cast< Type > ( no_stones_ - 4 ) ) {
 

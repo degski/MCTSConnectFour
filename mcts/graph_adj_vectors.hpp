@@ -46,176 +46,176 @@ class RootedDiGraphAdjVectors {
 
     public:
 
-	struct ArcType;
-	using Arc = ArcType*;
+    struct ArcType;
+    using Arc = ArcType*;
 
-	struct NodeType;
-	using Node = NodeType*;
+    struct NodeType;
+    using Node = NodeType*;
 
-	// using InList = pt::pector<Arc, vector_allocator<Arc>, uindex_t>;
-	// using OutList = pt::pector<Arc, vector_allocator<Arc>, uindex_t>;
+    // using InList = pt::pector<Arc, vector_allocator<Arc>, uindex_t>;
+    // using OutList = pt::pector<Arc, vector_allocator<Arc>, uindex_t>;
 
-	using InList = std::vector<Arc>;
-	using OutList = std::vector<Arc>;
+    using InList = std::vector<Arc>;
+    using OutList = std::vector<Arc>;
 
-	using in_iterator = typename InList::iterator;
-	using const_in_iterator = typename InList::const_iterator;
+    using in_iterator = typename InList::iterator;
+    using const_in_iterator = typename InList::const_iterator;
 
-	using out_iterator = typename OutList::iterator;
-	using const_out_iterator = typename OutList::const_iterator;
+    using out_iterator = typename OutList::iterator;
+    using const_out_iterator = typename OutList::const_iterator;
 
-	using Link = Link<RootedDiGraphAdjVectors>;
-	using Path = Path<RootedDiGraphAdjVectors>;
+    using Link = Link<RootedDiGraphAdjVectors>;
+    using Path = Path<RootedDiGraphAdjVectors>;
 
-	struct ArcType {
+    struct ArcType {
 
-		friend class RootedDiGraphAdjVectors<ArcData, NodeData>;
+        friend class RootedDiGraphAdjVectors<ArcData, NodeData>;
 
-		template<typename ... Args>
-		ArcType ( const Node source_, const Node target_, Args && ... args_ ) : source ( source_ ), target ( target_ ), data ( std::forward<Args> ( args_ ) ... ) { }
+        template<typename ... Args>
+        ArcType ( const Node source_, const Node target_, Args && ... args_ ) : source ( source_ ), target ( target_ ), data ( std::forward<Args> ( args_ ) ... ) { }
 
-		Node source, target;
-		ArcData data;
-	};
+        Node source, target;
+        ArcData data;
+    };
 
-	struct NodeType {
+    struct NodeType {
 
-		friend class RootedDiGraphAdjVectors<ArcData, NodeData>;
+        friend class RootedDiGraphAdjVectors<ArcData, NodeData>;
 
-		template<typename ... Args>
-		NodeType ( Args && ... args_ ) : data ( std::forward<Args> ( args_ ) ... ) { }
+        template<typename ... Args>
+        NodeType ( Args && ... args_ ) : data ( std::forward<Args> ( args_ ) ... ) { }
 
-	    private:
+        private:
 
-		InList in_arcs; OutList out_arcs;
+        InList in_arcs; OutList out_arcs;
 
-	    public:
+        public:
 
-		NodeData data;
-	};
+        NodeData data;
+    };
 
-	template<typename ... Args>
-	RootedDiGraphAdjVectors ( Args && ... args_ ) :
+    template<typename ... Args>
+    RootedDiGraphAdjVectors ( Args && ... args_ ) :
 
-		nodes_size ( 0 ), arcs_size ( 0 ),
-		nodes ( ), arcs ( ),
-		root_node ( addNode ( std::forward<Args> ( args_ ) ... ) ),
-		top_node ( root_node ) {
-	}
+        nodes_size ( 0 ), arcs_size ( 0 ),
+        nodes ( ), arcs ( ),
+        root_node ( addNode ( std::forward<Args> ( args_ ) ... ) ),
+        top_node ( root_node ) {
+    }
 
-	void setRoot ( const Node node_ ) noexcept {
+    void setRoot ( const Node node_ ) noexcept {
 
-		root_node = node_;
-		invalid_arc->target = root_node;
-	}
+        root_node = node_;
+        invalid_arc->target = root_node;
+    }
 
-	template<typename ... Args>
-	inline Node addNode ( Args && ... args_ ) noexcept {
+    template<typename ... Args>
+    Node addNode ( Args && ... args_ ) noexcept {
 
-		Node node = nodes.new_element ( std::forward<Args> ( args_ ) ... );
-		++nodes_size;
-		return node;
-	}
+        Node node = nodes.new_element ( std::forward<Args> ( args_ ) ... );
+        ++nodes_size;
+        return node;
+    }
 
-	template<typename ... Args>
-	inline Arc addArc ( const Node source_, const Node target_, Args && ... args_ ) noexcept {
+    template<typename ... Args>
+    Arc addArc ( const Node source_, const Node target_, Args && ... args_ ) noexcept {
 
-		Arc arc = arcs.new_element ( source_, target_, std::forward<Args> ( args_ ) ... );
-		++arcs_size;
-		outArcs ( source_ ).push_back ( arc );
-		inArcs ( target_ ).push_back ( arc );
-		return arc;
-	}
+        Arc arc = arcs.new_element ( source_, target_, std::forward<Args> ( args_ ) ... );
+        ++arcs_size;
+        outArcs ( source_ ).push_back ( arc );
+        inArcs ( target_ ).push_back ( arc );
+        return arc;
+    }
 
-	inline void erase ( const Arc arc_ ) noexcept {
+    void erase ( const Arc arc_ ) noexcept {
 
-		--arcs_size;
-		inArcs ( arc_->target ).erase ( arc_ );
-		outArcs ( arc_->source ).erase ( arc_ );
-		arcs.delete_element ( arc_ );
-	}
+        --arcs_size;
+        inArcs ( arc_->target ).erase ( arc_ );
+        outArcs ( arc_->source ).erase ( arc_ );
+        arcs.delete_element ( arc_ );
+    }
 
-	inline void erase ( const Node node_ ) noexcept {
+    void erase ( const Node node_ ) noexcept {
 
-		for ( auto arc : inArcs ( node_ ) ) {
+        for ( auto arc : inArcs ( node_ ) ) {
 
-			erase ( arc );
-		}
+            erase ( arc );
+        }
 
-		for ( auto arc : outArcs ( node_ ) ) {
+        for ( auto arc : outArcs ( node_ ) ) {
 
-			erase ( arc );
-		}
+            erase ( arc );
+        }
 
-		--nodes_size;
-		nodes.delete_element ( node_ );
-	}
+        --nodes_size;
+        nodes.delete_element ( node_ );
+    }
 
-	Link link ( const Arc arc_ ) const noexcept { return Link ( arc_, arc_->target ); }
-	Link link ( const Node source_, const Node target_ ) const noexcept {
+    Link link ( const Arc arc_ ) const noexcept { return Link ( arc_, arc_->target ); }
+    Link link ( const Node source_, const Node target_ ) const noexcept {
 
-		for ( const Arc arc : inArcs ( target_ ) ) {
+        for ( const Arc arc : inArcs ( target_ ) ) {
 
-			if ( source_ == arc->source ) {
+            if ( source_ == arc->source ) {
 
                 return { arc, target_ };
-			}
-		}
+            }
+        }
 
         return { invalid_arc, target_ };
-	}
+    }
 
-	template<typename It>
-	Link link ( const It & it_ ) const noexcept { return Link ( *it_, ( *it_ )->target ); }
+    template<typename It>
+    Link link ( const It & it_ ) const noexcept { return Link ( *it_, ( *it_ )->target ); }
 
-	bool isLeaf ( const Node node_ ) const noexcept { return node_->out_arcs.empty ( ); }
-	bool isInternal ( const Node node_ ) const noexcept { return node_->out_arcs.size ( ); }
+    bool isLeaf ( const Node node_ ) const noexcept { return node_->out_arcs.empty ( ); }
+    bool isInternal ( const Node node_ ) const noexcept { return node_->out_arcs.size ( ); }
 
-	inline const uindex_t inArcNum ( const Node node_ ) const noexcept { return node_->in_arcs.size ( ); }
-	inline const uindex_t outArcNum ( const Node node_ ) const noexcept { return node_->out_arcs.size ( ); }
+    const uindex_t inArcNum ( const Node node_ ) const noexcept { return node_->in_arcs.size ( ); }
+    const uindex_t outArcNum ( const Node node_ ) const noexcept { return node_->out_arcs.size ( ); }
 
-	inline const bool hasInArc ( const Node node_ ) const noexcept { return node_->in_arcs.size ( ); }
-	inline const bool hasOutArc ( const Node node_ ) const noexcept { return node_->out_arcs.size ( ); }
+    const bool hasInArc ( const Node node_ ) const noexcept { return node_->in_arcs.size ( ); }
+    const bool hasOutArc ( const Node node_ ) const noexcept { return node_->out_arcs.size ( ); }
 
-	inline in_iterator beginIn ( const Node node_ ) { return std::begin ( inArcs ( node_ ) ); }
-	inline const const_in_iterator cbeginIn ( const Node node_ ) const { return std::cbegin ( inArcs ( node_ ) ); }
-	inline in_iterator endIn ( const Node node_ ) { return std::end ( inArcs ( node_ ) ); }
-	inline const const_in_iterator cendIn ( const Node node_ ) const { return std::cend ( inArcs ( node_ ) ); }
+    in_iterator beginIn ( const Node node_ ) { return std::begin ( inArcs ( node_ ) ); }
+    const const_in_iterator cbeginIn ( const Node node_ ) const { return std::cbegin ( inArcs ( node_ ) ); }
+    in_iterator endIn ( const Node node_ ) { return std::end ( inArcs ( node_ ) ); }
+    const const_in_iterator cendIn ( const Node node_ ) const { return std::cend ( inArcs ( node_ ) ); }
 
-	inline out_iterator beginOut ( const Node node_ ) { return std::begin ( outArcs ( node_ ) ); }
-	inline const const_out_iterator cbeginOut ( const Node node_ ) const { return std::cbegin ( outArcs ( node_ ) ); }
-	inline out_iterator endOut ( const Node node_ ) { return std::end ( outArcs ( node_ ) ); }
-	inline const const_out_iterator cendOut ( const Node node_ ) const { return std::cend ( outArcs ( node_ ) ); }
+    out_iterator beginOut ( const Node node_ ) { return std::begin ( outArcs ( node_ ) ); }
+    const const_out_iterator cbeginOut ( const Node node_ ) const { return std::cbegin ( outArcs ( node_ ) ); }
+    out_iterator endOut ( const Node node_ ) { return std::end ( outArcs ( node_ ) ); }
+    const const_out_iterator cendOut ( const Node node_ ) const { return std::cend ( outArcs ( node_ ) ); }
 
-	inline NodeData& operator [ ] ( const Node node_ ) noexcept { return node_->data; }
-	inline const NodeData& operator [ ] ( const Node node_ ) const noexcept { return node_->data; }
-	inline ArcData& operator [ ] ( const Arc arc_ ) noexcept { return arc_->data; }
-	inline const ArcData& operator [ ] ( const Arc arc_ ) const noexcept { return arc_->data; }
+    NodeData& operator [ ] ( const Node node_ ) noexcept { return node_->data; }
+    const NodeData& operator [ ] ( const Node node_ ) const noexcept { return node_->data; }
+    ArcData& operator [ ] ( const Arc arc_ ) noexcept { return arc_->data; }
+    const ArcData& operator [ ] ( const Arc arc_ ) const noexcept { return arc_->data; }
 
-	uindex_t nodeNum ( ) const noexcept { return nodes_size; }
-	uindex_t arcNum ( ) const noexcept { return arcs_size; }
+    uindex_t nodeNum ( ) const noexcept { return nodes_size; }
+    uindex_t arcNum ( ) const noexcept { return arcs_size; }
 
-	inline InList& inArcs ( const Node node_ ) noexcept { return node_->in_arcs; }
-	inline const InList& inArcs ( const Node node_ ) const noexcept { return node_->in_arcs; }
-	inline OutList& outArcs ( const Node node_ ) noexcept { return node_->out_arcs; }
-	inline const OutList& outArcs ( const Node node_ ) const noexcept { return node_->out_arcs; }
+    InList& inArcs ( const Node node_ ) noexcept { return node_->in_arcs; }
+    const InList& inArcs ( const Node node_ ) const noexcept { return node_->in_arcs; }
+    OutList& outArcs ( const Node node_ ) noexcept { return node_->out_arcs; }
+    const OutList& outArcs ( const Node node_ ) const noexcept { return node_->out_arcs; }
 
     private:
 
-	uindex_t nodes_size, arcs_size;
+    uindex_t nodes_size, arcs_size;
 
-	pa::pool_allocator<NodeType> nodes;
-	pa::pool_allocator<ArcType> arcs;
+    pa::pool_allocator<NodeType> nodes;
+    pa::pool_allocator<ArcType> arcs;
 
     public:
 
-	Node root_node;
+    Node root_node;
     const Node top_node;
 
     private:
 
     static const std::unique_ptr<NodeType> smart_invalid_node;
-	static const std::unique_ptr<ArcType> smart_invalid_arc;
+    static const std::unique_ptr<ArcType> smart_invalid_arc;
 
     public:
 

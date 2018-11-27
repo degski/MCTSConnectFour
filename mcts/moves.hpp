@@ -25,7 +25,6 @@
 
 #include <cassert>
 
-
 #include <random>
 #include <iostream>
 
@@ -36,146 +35,110 @@
 #include "globals.hpp"
 
 
-template < typename T, index_t S >
+template<typename T, index_t S>
 class Moves {
 
-	typedef T moves_t [ S ]; // Typedeffing a c-array...
+    typedef T moves_t [ S ]; // Typedeffing a c-array...
 
-	index_t m_size = 0;
-	moves_t m_moves;
+    index_t m_size = 0;
+    moves_t m_moves;
 
-	static const index_t s_capacity, s_binary_size;
+    static const index_t s_capacity, s_binary_size;
 
 public:
 
-	typedef T value_type;
+    using value_type = T;
 
-	inline void clear ( ) noexcept {
+    void clear ( ) noexcept {
+        m_size = 0; // No destructor called.
+    }
 
-		m_size = 0; // No destructor called...
-	}
+    [[ nodiscard ]] index_t size ( ) const noexcept {
+        return m_size;
+    }
 
-	index_t size ( ) const noexcept {
+    [[ nodiscard ]] index_t capacity ( ) const noexcept {
+        return s_capacity;
+    }
 
-		return m_size;
-	}
+    [[ nodiscard ]] bool empty ( ) const noexcept {
+        return not ( m_size );
+    }
 
-	index_t capacity ( ) const noexcept {
+    [[ nodiscard ]] value_type at ( const index_t i_ ) const noexcept {
+        assert ( i_ >= 0 );
+        assert ( i_ < size ( ) );
+        return m_moves [ i_ ];
+    }
 
-		return s_capacity;
-	}
+    [[ nodiscard ]] value_type front ( ) const noexcept {
+        return m_moves [ 0 ];
+    }
 
-	bool empty ( ) const noexcept {
+    void push_back ( const value_type m_ ) noexcept {
+        m_moves [ m_size++ ] = m_;
+        assert ( m_size <= S );
+    }
 
-		return not ( m_size );
-	}
+    void emplace_back ( value_type && m_ ) noexcept {
+        m_moves [ m_size++ ] = std::move ( m_ );
+        assert ( m_size <= S );
+    }
 
-	value_type at ( const index_t i_ ) const noexcept {
+    [[ nodiscard ]] value_type random ( ) const noexcept {
+        return m_moves [ std::uniform_int_distribution < ptrdiff_t > ( 0, m_size - 1 ) ( g_rng ) ];
+    }
 
-		assert ( i_ >= 0 );
-		assert ( i_ < size ( ) );
+    [[ nodiscard ]] bool find ( const value_type m_ ) const noexcept {
+        for ( index_t i = 0; i < m_size; ++i ) {
+            if ( m_moves [ i ] == m_ ) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-		return m_moves [ i_ ];
-	}
+    [[ nodiscard ]] value_type draw ( ) noexcept {
+        if ( 1 == m_size ) {
+            return m_moves [ --m_size ];
+        }
+        else {
+            const index_t i = std::uniform_int_distribution < index_t > ( 0, m_size - 1 ) ( g_rng );
+            const value_type v = m_moves [ i ];
+            m_moves [ i ] = m_moves [ --m_size ];
+            assert ( m_size >= 0 );
+            return v;
+        }
+    }
 
-	value_type front ( ) const noexcept {
+    [[ nodiscard ]] Moves & operator = ( const Moves & rhs_ ) noexcept {
+        memcpy ( this, & rhs_, sizeof ( Moves ) );
+        return * this;
+    }
 
-		return m_moves [ 0 ];
-	}
+    void remove ( const value_type m_ ) noexcept {
+        if ( m_size < 2 and m_moves [ 0 ] == m_ ) {
+            m_size = 0;
+            return;
+        }
+        const index_t last = m_size - 1;
+        for ( index_t i = 0; i < last; ++i ) {
+            if ( m_moves [ i ] == m_ ) {
+                m_moves [ i ] = m_moves [ last ];
+                --m_size;
+                return;
+            }
+        }
+        if ( m_moves [ last ] == m_ ) {
+            --m_size;
+        }
+    }
 
-	void push_back ( const value_type m_ ) noexcept {
-
-		m_moves [ m_size++ ] = m_;
-
-		assert ( m_size <= S );
-	}
-
-	void emplace_back ( value_type && m_ ) noexcept {
-
-		m_moves [ m_size++ ] = std::move ( m_ );
-
-		assert ( m_size <= S );
-	}
-
-	value_type random ( ) const noexcept {
-
-		return m_moves [ std::uniform_int_distribution < ptrdiff_t > ( 0, m_size - 1 ) ( g_rng ) ];
-	}
-
-	bool find ( const value_type m_ ) const noexcept {
-
-		for ( index_t i = 0; i < m_size; ++i ) {
-
-			if ( m_moves [ i ] == m_ ) {
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	value_type draw ( ) noexcept {
-
-		if ( 1 == m_size ) {
-
-			return m_moves [ --m_size ];
-		}
-
-		else {
-
-			const index_t i = std::uniform_int_distribution < index_t > ( 0, m_size - 1 ) ( g_rng );
-			const value_type v = m_moves [ i ];
-
-			m_moves [ i ] = m_moves [ --m_size ];
-
-			assert ( m_size >= 0 );
-
-			return v;
-		}
-	}
-
-	Moves & operator = ( const Moves & rhs_ ) noexcept {
-
-		memcpy ( this, & rhs_, sizeof ( Moves ) );
-
-		return * this;
-	}
-
-	void remove ( const value_type m_ ) noexcept {
-
-		if ( m_size < 2 and m_moves [ 0 ] == m_ ) {
-
-			m_size = 0;
-
-			return;
-		}
-
-		const index_t last = m_size - 1;
-
-		for ( index_t i = 0; i < last; ++i ) {
-
-			if ( m_moves [ i ] == m_ ) {
-
-				m_moves [ i ] = m_moves [ last ];
-				--m_size;
-
-				return;
-			}
-		}
-
-		if ( m_moves [ last ] == m_ ) {
-
-			--m_size;
-		}
-	}
-
-	template < class Archive >
-	inline void serialize ( Archive & ar_ ) noexcept {
-
-		ar_ ( m_size );
-		ar_ ( cereal::binary_data ( & m_moves, m_size * sizeof ( T ) ) );
-	}
+    template < class Archive >
+    void serialize ( Archive & ar_ ) noexcept {
+        ar_ ( m_size );
+        ar_ ( cereal::binary_data ( & m_moves, m_size * sizeof ( T ) ) );
+    }
 };
 
 template < typename T, index_t S >

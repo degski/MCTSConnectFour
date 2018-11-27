@@ -47,146 +47,90 @@
 
 /*
 
-int32_t main36476 ( ) {
+int wmain36476 ( ) {
+    boost::optional<Player> winner;
+    std::uint32_t matches = 0, agent_wins = 0, draws = 0;
+    putchar ( '\n' ); putchar ( ' ' );
+    g_clock.restart ( );
+    sf::Time elapsed, match_start;
+    // while ( true ) {
+    for ( index_t i = 0; i < 10; ++i ) {
+        {
+            ConnectFour < > state;
+            match_start = now ( );
+            do {
+                mcts::compute ( state, state.playerToMove ( ) == Player::type::agent ? 50'000 : 5'000 );
+            } while ( not ( winner = state.ended ( ) ) );
+        }
+        elapsed += since ( match_start );
+        ++matches;
+        switch ( winner.get ( ).as_index ( ) ) {
+            case ( index_t ) Player::type::agent: ++agent_wins; break;
+            case ( index_t ) Player::type::vacant: ++draws; break;
+            default:;
+        }
+        float c = ( ( ( float ) agent_wins + ( ( float ) draws * 0.5f ) ) / ( float ) matches ) * 1000.0f;
+        c = ( ( int ) c ) / 10.0f;
+        printf ( "\r  Match %i: Agent%6.1f%% - Human%6.1f%% (%.1f Sec./Match - %.1f Sec.) ", matches, c, 100.0f - c, elapsed.asSeconds ( ) / ( float ) matches, elapsed.asSeconds ( ) );
+    }
 
-	boost::optional < Player > winner;
+    // std::cout << "\n\n Check " << ( ( g_rng ( ) == 8085774262754287791ULL ) ? "OK" : "BAD" ) << "\n\n";
 
-	uint32_t matches = 0, agent_wins = 0, draws = 0;
-
-	putchar ( '\n' ); putchar ( ' ' );
-
-	g_clock.restart ( );
-
-	sf::Time elapsed, match_start;
-
-	// while ( true ) {
-
-	for ( index_t i = 0; i < 10; ++i ) {
-
-		{
-			ConnectFour < > state;
-
-			match_start = now ( );
-
-			do {
-
-				mcts::compute ( state, state.playerToMove ( ) == Player::type::agent ? 50'000 : 5'000 );
-
-			} while ( not ( winner = state.ended ( ) ) );
-		}
-
-		elapsed += since ( match_start );
-
-		++matches;
-
-		switch ( winner.get ( ).as_index ( ) ) {
-
-			case ( index_t ) Player::type::agent: ++agent_wins; break;
-			case ( index_t ) Player::type::vacant: ++draws; break;
-
-			default:;
-		}
-
-		float c = ( ( ( float ) agent_wins + ( ( float ) draws * 0.5f ) ) / ( float ) matches ) * 1000.0f;
-
-		c = ( ( int ) c ) / 10.0f;
-
-		printf ( "\r  Match %i: Agent%6.1f%% - Human%6.1f%% (%.1f Sec./Match - %.1f Sec.) ", matches, c, 100.0f - c, elapsed.asSeconds ( ) / ( float ) matches, elapsed.asSeconds ( ) );
-	}
-
-	// std::cout << "\n\n Check " << ( ( g_rng ( ) == 8085774262754287791ULL ) ? "OK" : "BAD" ) << "\n\n";
-
-	return 0;
+    return EXIT_SUCCESS;
 }
 */
 
-int32_t main ( ) {
-
+int wmain ( ) {
 #if CF
-	typedef ConnectFour <> State;
+    typedef ConnectFour<> State;
 #else
-	typedef OskaStateTemplate < 4 > State;
+    typedef OskaStateTemplate<4> State;
 #endif
-
-	typedef mcts::Mcts < State > Mcts;
-
-	std::optional < Player > winner;
-
-	uint32_t matches = 0, agent_wins = 0, human_wins = 0;
-
-	putchar ( '\n' );
-
-	sf::Time elapsed, match_start;
-
-	for ( index_t i = 0; i < 1000; ++i ) {
-
-		{
-			State state;
-
-			state.initialize ( );
-
-			Mcts * mcts_agent = new Mcts ( ), * mcts_human = new Mcts ( );
-
-			match_start = now ( );
-
-			do {
-
-				state.move_hash_winner ( state.playerToMove ( ) == Player::type::agent ? mcts_agent->compute ( state, 20'000 ) : mcts_human->compute ( state, 2'000 ) );
-
-				Mcts::reset ( state.playerToMove ( ) == Player::type::agent ? mcts_agent : mcts_human, state, state.playerToMove ( ) );
-
-			} while ( not ( winner = state.ended ( ) ) );
-
+    using Mcts = mcts::Mcts<State>;
+    std::optional<Player> winner;
+    std::uint32_t matches = 0u, agent_wins = 0u, human_wins = 0u;
+    putchar ( '\n' );
+    sf::Time elapsed, match_start;
+    for ( index_t i = 0; i < 1000; ++i ) {
+        {
+            State state;
+            state.initialize ( );
+            Mcts * mcts_agent = new Mcts ( ), * mcts_human = new Mcts ( );
+            match_start = now ( );
+            do {
+                state.move_hash_winner ( state.playerToMove ( ) == Player::type::agent ? mcts_agent->compute ( state, 20'000 ) : mcts_human->compute ( state, 2'000 ) );
+                Mcts::reset ( state.playerToMove ( ) == Player::type::agent ? mcts_agent : mcts_human, state, state.playerToMove ( ) );
+            } while ( not ( winner = state.ended ( ) ) );
 #if 0
-
-			state.print ( );
-
-			if ( winner.get ( ) == Player::type::agent ) {
-
-				std::cout << " Winner: Agent\n";
-			}
-
-			else if ( winner.get ( ) == Player::type::human ) {
-
-				std::cout << " Winner: Human\n";
-			}
-
-			else {
-
-				std::cout << " Draw\n";
-			}
-
+            state.print ( );
+            if ( winner.get ( ) == Player::type::agent ) {
+                std::wcout << L" Winner: Agent\n";
+            }
+            else if ( winner.get ( ) == Player::type::human ) {
+                std::wcout << L" Winner: Human\n";
+            }
+            else {
+                std::wcout << L" Draw\n";
+            }
 #endif
+            // saveToFile ( * mcts_human, "human" );
+            delete mcts_human;
+            // saveToFile ( * mcts_agent, "agent" );
+            delete mcts_agent;
+        }
+        elapsed += since ( match_start );
+        ++matches;
+        switch ( winner->as_index ( ) ) {
+            case ( index_t ) Player::type::agent: ++agent_wins; break;
+            case ( index_t ) Player::type::human: ++human_wins; break;
+            NO_DEFAULT_CASE;
+        }
+        float a = ( 1000.0f * agent_wins ) / float ( agent_wins + human_wins );
+        a = ( ( int ) a ) / 10.0f;
+        float h = ( 1000.0f * human_wins ) / float ( agent_wins + human_wins );
+        h = ( ( int ) h ) / 10.0f;
+        printf ( "\r Match %i: Agent%6.1f%% - Human%6.1f%% (%.1f Sec./Match - %.1f Sec.)", matches, a, h, elapsed.asSeconds ( ) / ( float ) matches, elapsed.asSeconds ( ) );
+    }
 
-			// saveToFile ( * mcts_human, "human" );
-
-			delete mcts_human;
-
-			// saveToFile ( * mcts_agent, "agent" );
-
-			delete mcts_agent;
-		}
-
-		elapsed += since ( match_start );
-
-		++matches;
-
-		switch ( winner->as_index ( ) ) {
-
-			case ( index_t ) Player::type::agent: ++agent_wins; break;
-			case ( index_t ) Player::type::human: ++human_wins; break;
-
-			NO_DEFAULT_CASE;
-		}
-
-		float a = ( 1000.0f * agent_wins ) / float ( agent_wins + human_wins );
-		a = ( ( int ) a ) / 10.0f;
-
-		float h = ( 1000.0f * human_wins ) / float ( agent_wins + human_wins );
-		h = ( ( int ) h ) / 10.0f;
-
-		printf ( "\r Match %i: Agent%6.1f%% - Human%6.1f%% (%.1f Sec./Match - %.1f Sec.)", matches, a, h, elapsed.asSeconds ( ) / ( float ) matches, elapsed.asSeconds ( ) );
-	}
-
-	return 0;
+    return EXIT_SUCCESS;
 }

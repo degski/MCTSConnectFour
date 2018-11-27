@@ -26,9 +26,9 @@
 #include <cstdint>
 
 
-typedef int32_t index_t;
-typedef uint32_t uindex_t;
-typedef size_t ZobristHash;
+typedef std::int32_t index_t;
+typedef std::uint32_t uindex_t;
+typedef std::size_t ZobristHash;
 
 #include <boost/uuid/uuid.hpp>
 
@@ -37,5 +37,5 @@ typedef boost::uuids::uuid UserId;
 #include <pector/pector.h>
 #include <pector/malloc_allocator.h>
 
-template < typename T >
+template<typename T>
 using pector = pt::pector < T, pt::malloc_allocator < T, true, false > , uindex_t, pt::default_recommended_size, false > ;
