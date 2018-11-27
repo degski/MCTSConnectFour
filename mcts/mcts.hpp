@@ -46,11 +46,11 @@
 #include "types.hpp"
 #include "player.hpp"
 #include "flat_search_tree.hpp"
-// #include "graph_adj_vectors.hpp"
+
 
 namespace mcts {
 
-    template < typename T, uindex_t N = 128 >
+    template<typename T, uindex_t N = 128>
     class Stack {
 
         pector<T> m_data;
@@ -104,82 +104,57 @@ namespace mcts {
 
 
 
-    template < typename State >
+    template<typename State>
     struct ArcData { // 1 bytes.
 
-        typedef State state_type;
-
+        using state_type = State;
         // float m_score = 0.0f; // 4 bytes.
         // std::int32_t m_visits = 0; // 4 bytes.
-
         typename State::Move m_move = State::Move::invalid; // 1 bytes.
 
-        // Constructors.
-
         ArcData ( ) noexcept {
-
             // std::cout << "arcdata default constructed\n";
         }
-
         ArcData ( const State & state_ ) noexcept {
-
             // std::cout << "arcdata constructed from state\n";
-
             m_move = state_.lastMove ( );
         }
-
         ArcData ( const ArcData & ad_ ) noexcept {
-
             // std::cout << "arcdata copy constructed\n";
-
             // m_score = nd_.m_score;
             // m_visits = nd_.m_visits;
-
             m_move = ad_.m_move;
         }
-
         ArcData ( ArcData && ad_ ) noexcept {
-
             // std::cout << "arcdata move constructed\n";
-
             // m_score = std::move ( ad_.m_score );
             // m_visits = std::move ( ad_.m_visits );
-
             m_move = std::move ( ad_.m_move );
         }
 
-        ~ArcData ( ) noexcept { }
+        ~ArcData ( ) noexcept {
+        }
 
-        ArcData & operator += ( const ArcData & rhs_ ) noexcept {
-
+        [[ maybe_unused ]] ArcData & operator += ( const ArcData & rhs_ ) noexcept {
             // m_score += rhs_.m_score;
             // m_visits += rhs_.m_visits;
-
             return * this;
         }
 
-        ArcData & operator = ( const ArcData & ad_ ) noexcept {
-
+        [[ maybe_unused ]] ArcData & operator = ( const ArcData & ad_ ) noexcept {
             // std::cout << "arcdata copy assigned\n";
-
             // m_score = nd_.m_score;
             // m_visits = nd_.m_visits;
-
             m_move = ad_.m_move;
-
-            return *this;
+            return * this;
         }
 
-        ArcData & operator = ( ArcData && ad_ ) noexcept {
-
+        [[ maybe_unused ]] ArcData & operator = ( ArcData && ad_ ) noexcept {
             // std::cout << "arcdata move assigned\n";
-
             // m_score = std::move ( ad_.m_score );
             // m_visits = std::move ( ad_.m_visits );
-
             m_move = std::move ( ad_.m_move );
-
-            return *this;
+            return * this;
         }
 
     private:
@@ -187,19 +162,21 @@ namespace mcts {
         friend class cereal::access;
 
         template < class Archive >
-        void serialize ( Archive & ar_ ) { ar_ ( m_move ); }
+        void serialize ( Archive & ar_ ) {
+            ar_ ( m_move );
+        }
     };
 
 
 
-    template < typename State >
+    template<typename State>
     struct NodeData { // 17 bytes.
 
-        typedef State state_type;
-        typedef typename State::Moves Moves;
-        typedef typename State::Moves::value_type Move;
-        typedef pa::pool_allocator < Moves > MovesPool;
-        typedef llvm::OwningPtr < MovesPool > MovesPoolPtr;
+        using state_type = State;
+        using Moves = typename State::Moves;
+        using Move = typename State::Moves::value_type;
+        using MovesPool = pa::pool_allocator<Moves>;
+        using MovesPoolPtr = llvm::OwningPtr <MovesPool>;
 
         Moves * m_moves = nullptr;  // 8 bytes.
 
@@ -211,107 +188,71 @@ namespace mcts {
         // Constructors.
 
         NodeData ( ) noexcept {
-
             // std::cout << "nodedata default constructed\n";
         }
-
         NodeData ( const State & state_ ) noexcept {
-
             // std::cout << "nodedata constructed from state\n";
-
             m_moves = m_moves_pool->new_element ( );
-
             if ( not ( state_.moves ( m_moves ) ) ) {
-
                 m_moves_pool->delete_element ( m_moves );
-
                 m_moves = nullptr;
             }
-
             m_player_just_moved = state_.playerJustMoved ( );
         }
-
         NodeData ( const NodeData & nd_ ) noexcept {
-
             // std::cout << "nodedata copy constructed\n";
-
             if ( nd_.m_moves != nullptr ) {
-
                 m_moves = m_moves_pool->new_element ( *nd_.m_moves );
             }
-
             m_score = nd_.m_score;
             m_visits = nd_.m_visits;
             m_player_just_moved = nd_.m_player_just_moved;
         }
-
         NodeData ( NodeData && nd_ ) noexcept {
-
             // std::cout << "nodedata move constructed\n";
-
             std::swap ( m_moves, nd_.m_moves );
-
             m_score = std::move ( nd_.m_score );
             m_visits = std::move ( nd_.m_visits );
             m_player_just_moved = std::move ( nd_.m_player_just_moved );
         }
 
         ~NodeData ( ) noexcept {
-
             m_moves_pool->delete_element ( m_moves ); // Checked for nullptr in delete_element ( ... ).
         }
 
-        Move getUntriedMove ( ) noexcept {
-
+        [[ nodiscard ]] Move getUntriedMove ( ) noexcept {
             if ( 1 == m_moves->size ( ) ) {
-
                 const Move move = m_moves->front ( );
-
                 m_moves_pool->delete_element ( m_moves );
-
                 m_moves = nullptr;
-
                 return move;
             }
-
             return m_moves->draw ( );
         }
 
-        NodeData & operator += ( const NodeData & rhs_ ) noexcept {
-
+        [[ maybe_unused ]] NodeData & operator += ( const NodeData & rhs_ ) noexcept {
             m_score += rhs_.m_score;
             m_visits += rhs_.m_visits;
-
             return * this;
         }
 
-
-        NodeData & operator = ( const NodeData & nd_ ) noexcept {
-
+        [[ maybe_unused ]] NodeData & operator = ( const NodeData & nd_ ) noexcept {
             // std::cout << "nodedata copy assigned\n";
-
             if ( nd_.m_moves != nullptr ) {
-
                 m_moves = m_moves_pool->new_element ( *nd_.m_moves );
             }
-
             m_score = nd_.m_score;
             m_visits = nd_.m_visits;
             m_player_just_moved = nd_.m_player_just_moved;
-
-            return *this;
+            return * this;
         }
 
-        NodeData & operator = ( NodeData && nd_ ) noexcept {
-
+        [[ maybe_unused ]] NodeData & operator = ( NodeData && nd_ ) noexcept {
             // std::cout << "nodedata move assigned\n";
-
             std::swap ( m_moves, nd_.m_moves );
-
             m_score = std::move ( nd_.m_score );
             m_visits = std::move ( nd_.m_visits );
             m_player_just_moved = std::move ( nd_.m_player_just_moved );
-
             return * this;
         }
 
@@ -323,44 +264,33 @@ namespace mcts {
 
         template < class Archive >
         void save ( Archive & ar_ ) const noexcept {
-
             if ( m_moves != nullptr ) {
-
                 const int8_t tmp = 2;
-
                 ar_ ( tmp );
                 m_moves->serialize ( ar_ );
             }
-
             else {
-
                 const int8_t tmp = 1;
-
                 ar_ ( tmp );
             }
-
             ar_ ( m_score, m_visits, m_player_just_moved );
         }
 
         template < class Archive >
         void load ( Archive & ar_ ) noexcept {
-
             int8_t tmp = -1;
-
             ar_ ( tmp );
-
             if ( tmp == 2 ) {
-
                 m_moves = m_moves_pool->new_element ( );
                 m_moves->serialize ( ar_ );
             }
-
             ar_ ( m_score, m_visits, m_player_just_moved );
         }
     };
 
-    template < typename State >
+    template<typename State>
     typename NodeData<State>::MovesPoolPtr NodeData<State>::m_moves_pool ( new MovesPool ( ) );
+
 
     template <typename State>
     using Tree = fst::SearchTree<ArcData<State>, NodeData<State>>;
@@ -377,31 +307,31 @@ namespace mcts {
 
     public:
 
-        typedef Tree<State> Tree;
+        using Tree = Tree<State>;
 
-        typedef typename Tree::ArcID ArcID;
-        typedef typename Tree::NodeID NodeID;
+        using ArcID = typename Tree::ArcID;
+        using NodeID = typename Tree::NodeID;
 
-        typedef ArcData<State> ArcData;
-        typedef NodeData<State> NodeData;
+        using ArcData = ArcData<State>;
+        using NodeData = NodeData<State>;
 
-        typedef typename Tree::in_iterator InIt;
-        typedef typename Tree::out_iterator OutIt;
+        using InIt = typename Tree::in_iterator;
+        using OutIt = typename Tree::out_iterator;
 
-        typedef typename Tree::const_in_iterator cInIt;
-        typedef typename Tree::const_out_iterator cOutIt;
+        using cInIt = typename Tree::const_in_iterator;
+        using cOutIt = typename Tree::const_out_iterator;
 
-        typedef typename State::Move Move;
-        typedef typename State::Moves Moves;
+        using Move = typename State::Move;
+        using Moves = typename State::Moves;
 
-        typedef typename State::Player Player;
+        using Player = typename State::Player;
 
-        typedef typename Tree::Link Link;
-        typedef typename Tree::Path Path;
+        using Link = typename Tree::Link;
+        using Path = typename Tree::Path;
 
-        typedef std::unordered_map<ZobristHash, NodeID> TranspositionTable;
-        typedef std::vector < ZobristHash > InverseTranspositionTable;
-        typedef llvm::OwningPtr<TranspositionTable> TranspositionTablePtr;
+        using TranspositionTable = std::unordered_map<ZobristHash, NodeID>;
+        using InverseTranspositionTable = std::vector < ZobristHash >;
+        using TranspositionTablePtr = llvm::OwningPtr<TranspositionTable>;
 
         // The data.
 
@@ -441,7 +371,7 @@ namespace mcts {
         }
 
         [[ nodiscard ]] Link addNode ( const NodeID parent_, const State & state_ ) noexcept {
-            const Link link_to_child ( addArc ( parent_, m_tree.addNode ( state_ ), state_ ) );
+            const Link link_to_child { addArc ( parent_, m_tree.addNode ( state_ ), state_ ) };
             m_transposition_table->emplace ( state_.zobrist ( ), link_to_child.target );
             return link_to_child;
         }
@@ -490,7 +420,7 @@ namespace mcts {
 
         [[ nodiscard ]] std::int32_t getVisits ( const NodeID node_ ) const noexcept {
             std::int32_t visits = 0;
-            for ( InIt a ( m_tree, node_ ); a != InIt::end ( ); ++a ) {
+            for ( InIt a { m_tree, node_ }; a.is_valid ( ); ++a ) {
                 visits += m_tree [ a ].m_visits;
             }
             return visits;
@@ -499,11 +429,11 @@ namespace mcts {
 
         [[ nodiscard ]] float getUCTFromArcs ( const NodeID parent_, const NodeID child_ ) const noexcept {
             ArcData child_data;
-            for ( InIt a ( m_tree, child_ ); a != InIt::end ( ); ++a ) {
+            for ( InIt a { m_tree, child_ }; a.is_valid ( ); ++a ) {
                 child_data += m_tree [ a ];
             }
             std::int32_t visits = 1;
-            for ( InIt a ( m_tree, parent_ ); a != InIt::end ( ); ++a ) {
+            for ( InIt a { m_tree, parent_ }; a.is_valid ( ); ++a ) {
                 visits += m_tree [ a ].m_visits;
             }
             //                              Exploitation                                                             Exploration
@@ -523,10 +453,10 @@ namespace mcts {
 
         [[ nodiscard ]] Link selectChildRandom ( const NodeID parent_ ) const noexcept {
             boost::container::static_vector<Link, State::max_no_moves> children;
-            for ( OutIt a ( m_tree, parent_ ); a != OutIt::end ( ); ++a ) {
-                children.emplace_back ( m_tree.link ( a ) );
+            for ( OutIt a ( m_tree, parent_ ); a.is_valid ( ); ++a ) {
+                children.emplace_back ( a.id ( ), a->target );
             }
-            return children [ std::uniform_int_distribution < ptrdiff_t > ( 0, children.size ( ) - 1 ) ( g_rng ) ];
+            return children [ std::uniform_int_distribution<ptrdiff_t> ( 0, children.size ( ) - 1 ) ( g_rng ) ];
         }
 
 
@@ -555,11 +485,11 @@ namespace mcts {
         // State is updated to reflect move.
         [[ nodiscard ]] Link addChild ( const NodeID parent_, const State & state_ ) noexcept {
             const NodeID child = getNode ( state_.zobrist ( ) );
-            return child == Tree::NodeID::invalid ? addNode ( parent_, state_ ) : addArc ( parent_, child, state_ );
+            return Tree::NodeID::invalid == child ? addNode ( parent_, state_ ) : addArc ( parent_, child, state_ );
         }
 
 
-        void updateData ( Link && link_, const State & state_ ) noexcept {
+        void updateData ( const Link & link_, const State & state_ ) noexcept {
             const float result = state_.result ( m_tree [ link_.target ].m_player_just_moved );
             // ++m_tree [ link_.arc ].m_visits;
             // m_tree [ link_.arc ].m_score += result;
@@ -590,7 +520,7 @@ namespace mcts {
         // Adding the move of the opponent to the path (and possibly to the tree).
         void connectStatesPath ( const State & state_ ) noexcept {
             const NodeID parent = m_path.back ( ).target; NodeID child = getNode ( state_.zobrist ( ) );
-            if ( child == Tree::NodeID::invalid ) {
+            if ( Tree::NodeID::invalid == child ) {
                 child = addNode ( parent, state_ ).target;
             }
             m_path.push ( m_tree.link ( parent, child ) );
@@ -610,32 +540,21 @@ namespace mcts {
             }
 
             // const Player player = state_.playerToMove ( );
-
             // if ( player == Player::type::agent ) {
-
                 // m_path.print ( );
             // }
 
             // max_iterations_ -= m_tree.nodeNum ( );
 
             while ( max_iterations_-- > 0 ) {
-
                 NodeID node = m_tree.root_node;
                 State state ( state_ );
-
                 // Select a path through the tree to a leaf node.
-
                 while ( hasNoUntriedMoves ( node ) and hasChildren ( node ) ) {
-
                     // UCT is only applied in nodes of which the visit count
                     // is higher than a certain threshold T
-
-                    // Link child = player == Player::type::agent and m_tree [ node ].m_visits < threshold ? selectChildRandom ( node ) :
-
                     Link child = selectChildUCT ( node );
-
                     state.move_hash ( m_tree [ child.arc ].m_move );
-
                     m_path.push ( child );
                     node = child.target;
                 }
@@ -645,12 +564,9 @@ namespace mcts {
                 static int cnt = 0;
 
                 if ( state != m_tree [ node ].m_state ) {
-
                     state.print ( );
                     m_tree [ node ].m_state.print ( );
-
                     ++cnt;
-
                     if ( cnt == 100 ) exit ( 0 );
                 }
 
@@ -663,11 +579,8 @@ namespace mcts {
                 // children of a node when a node's visit count equals T
 
                 if ( hasUntriedMoves ( node ) ) {
-
                     // if ( player == Player::type::agent and m_tree [ node ].m_visits < threshold )
-
                     state.move_hash_winner ( getUntriedMove ( node ) ); // State update.
-
                     m_path.push ( addChild ( node, state ) );
                 }
 
@@ -675,69 +588,58 @@ namespace mcts {
                 // randomly until the game ends.
 
                 // if ( player == Player::type::human ) {
-
-                    //state.simulate ( );
-
-                    //for ( Link link : m_path ) {
-
+                    // state.simulate ( );
+                    // for ( Link & link : m_path ) {
                         // We have now reached a final state. Backpropagate the result up the
                         // tree to the root node.
-
-                        //updateData ( std::move ( link ), state );
-                    //}
-
+                        // updateData ( link, state );
+                    // }
                 // }
 
                 // else {
 
-                    for ( index_t i = 0; i < 3; ++i ) {
-
-                        State sim_state ( state );
-
-                        sim_state.simulate ( );
-
-                        // We have now reached a final state. Backpropagate the result up the
-                        // tree to the root node.
-
-                        for ( Link link : m_path ) {
-                            updateData ( std::move ( link ), sim_state );
-                        }
+                for ( index_t i = 0; i < 3; ++i ) {
+                    State sim_state ( state );
+                    sim_state.simulate ( );
+                    // We have now reached a final state. Backpropagate the result up the
+                    // tree to the root node.
+                    for ( Link & link : m_path ) {
+                        updateData ( link, sim_state );
                     }
-
+                }
                 // }
-
                 m_path.resize ( m_path_size );
             }
-
             return getBestMove ( );
         }
 
+        private:
 
         void prune_impl ( Mcts * new_mcts_, const State & state_ ) noexcept {
-            // at::AutoTimer t ( at::milliseconds );
-            typedef pector < NodeID > Visited; // New m_nodes by old_index.
-            typedef Queue < NodeID > Queue;
+            using Visited = typename Tree::Visited; // New m_nodes by old_index.
+            using Stack = typename Tree::Stack;
             // Prune Tree.
             const NodeID old_node = getNode ( state_.zobrist ( ) [ 0 ] );
-            Visited visited ( m_tree.nodeNum ( ), Tree::invalid_node );
-            visited [ old_node ] = m_tree.root_node;
-            Queue queue ( old_node );
             Tree & new_tree = new_mcts_->m_tree;
-            new_tree [ m_tree.root_node ] = std::move ( m_tree [ old_node ] );
-            while ( queue.not_empty ( ) ) {
-                const NodeID parent = queue.pop ( );
-                for ( OutIt a ( m_tree, parent ); a != OutIt::end ( ); ++a ) {
-                    const NodeID child = m_tree.target ( a );
-                    if ( visited [ child ] == Tree::invalid_node ) { // Not visited yet.
-                        const Link link = new_tree.addNodeUnsafe ( visited [ parent ] );
-                        visited [ child ] = link.target;
-                        queue.push ( child );
-                        new_tree [ link.arc ] = std::move ( m_tree [ a ] );
-                        new_tree [ link.target ] = std::move ( m_tree [ child ] );
+            new_mcts_->m_tree = Tree { std::move ( m_tree [ old_node ] ) };
+            // The Visited-vector stores the new NodeID's indexed by old NodeID's,
+            // old NodeID's not present in the new tree have a value of NodeID::invalid.
+            static Visited visited;
+            visited.clear ( );
+            visited.resize ( m_tree.nodeNum ( ), Tree::NodeID::invalid );
+            visited [ old_node.value ] = new_tree.root_node;
+            static Stack stack;
+            stack.clear ( );
+            stack.push_back ( old_node );
+            while ( stack.size ( ) ) {
+                const NodeID parent = stack.back ( ); stack.pop_back ( );
+                for ( OutIt a { m_tree, parent }; a.is_valid ( ); ++a ) {
+                    const NodeID child { a->target };
+                    if ( Tree::NodeID::invalid == visited [ child.value ] ) { // Not visited yet.
+                        visited [ child.value ] = new_tree.addNode ( std::move ( m_tree [ child ] ) );
+                        stack.push_back ( child );
                     }
-                    else {
-                        new_tree [ new_tree.addArcUnsafe ( visited [ parent ], visited [ child ] ).arc ] = std::move ( m_tree [ a ] );
-                    }
+                    new_tree.addArc ( visited [ parent.value ], visited [ child.value ], std::move ( m_tree [ a.id ( ) ] ) );
                 }
             }
             // Purge TransitionTable.
@@ -746,8 +648,8 @@ namespace mcts {
             while ( it != it_cend ) {
                 const auto tmp_it = it;
                 ++it;
-                const NodeID new_node = visited [ tmp_it->second ];
-                if ( new_node == Tree::invalid_node ) {
+                const NodeID new_node = visited [ tmp_it->second.value ];
+                if ( Tree::NodeID::invalid == new_node ) {
                     m_transposition_table->erase ( tmp_it );
                 }
                 else {
@@ -762,6 +664,8 @@ namespace mcts {
             new_mcts_->m_path.reset ( new_tree.root_arc, new_tree.root_node );
             new_mcts_->m_path_size = 1;
         }
+
+        public:
 
         static void prune ( Mcts * & old_mcts_, const State & state_ ) noexcept {
             if ( not ( old_mcts_->m_not_initialized ) and old_mcts_->getNode ( state_.zobrist ( ) [ 0 ] ) != Mcts::Tree::invalid_node ) {
@@ -778,7 +682,7 @@ namespace mcts {
         static void reset ( Mcts * & mcts_, const State & state_, const Player player_ ) noexcept {
             if ( not ( mcts_->m_not_initialized ) ) {
                 const Mcts::NodeID new_root_node = mcts_->getNode ( state_.zobrist ( ) );
-                if ( new_root_node != Mcts::Tree::NodeID::invalid ) {
+                if ( Mcts::Tree::NodeID::invalid != new_root_node ) {
                     // The state exists in the tree and it's not the current
                     // root_node, i.e. re-hang the tree.
                     mcts_->m_tree.root_node = new_root_node;
@@ -797,127 +701,86 @@ namespace mcts {
         [[ nodiscard ]] InverseTranspositionTable invertTranspositionTable ( ) const noexcept {
             InverseTranspositionTable itt ( m_transposition_table->size ( ) );
             for ( auto & e : * m_transposition_table ) {
-                itt [ e.second ] = e.first;
+                itt [ e.second.value ] = e.first;
             }
             return itt;
         }
 
 
         static void merge ( Mcts * & t_mcts_, Mcts * & s_mcts_ ) {
-
             // Same pointer, do nothing.
-
             if ( t_mcts_ == s_mcts_ ) {
-
                 return;
             }
-
             // t_mcts_ (target) becomes the largest tree, we're merging the smaller tree (source) into the larger tree.
-
             if ( t_mcts_->m_tree.nodeNum ( ) < s_mcts_->m_tree.nodeNum ( ) ) {
-
                 std::swap ( t_mcts_, s_mcts_ );
             }
-
             // Avoid some levels of indirection and make things clearer.
-
             Tree & t_t = t_mcts_->m_tree, & s_t = s_mcts_->m_tree; // target tree, source tree.
             TranspositionTable & t_tt = * t_mcts_->m_transposition_table; // target transposition table.
-            InverseTranspositionTable s_itt ( std::move ( s_mcts_->invertTranspositionTable ( ) ) ); // source inverse transposition table.
-
+            InverseTranspositionTable s_itt { s_mcts_->invertTranspositionTable ( ) }; // source inverse transposition table.
             // bfs help structures.
-
-            typedef boost::dynamic_bitset < > Visited;
-            typedef Queue < NodeID > Queue;
-
-            Visited s_visited ( s_t.nodeNum ( ) );
-            Queue s_queue ( s_t.root_node );
-
-            s_visited [ s_t.root_node ] = true;
-
+            using Visited = boost::dynamic_bitset<>;
+            using Queue = Queue<NodeID>;
+            Visited s_visited { s_t.nodeNum ( ) };
+            Queue s_queue { { s_t.root_node } };
+            s_visited [ s_t.root_node.value ] = true;
             // Walk the tree, breadth first.
-
             while ( s_queue.not_empty ( ) ) {
-
                 // The t_source (target parent) does always exist, as we are going at it breadth first.
-
-                const NodeID s_source = s_queue.pop ( ), t_source = t_tt.find ( s_itt [ s_source ] )->second;
-
+                const NodeID s_source = s_queue.pop ( ), t_source = t_tt.find ( s_itt [ s_source.value ] )->second;
                 // Iterate over children (targets) of the parent (source).
-
-                for ( OutIt soi ( s_t, s_source ); soi != OutIt::end ( ); ++soi ) { // Source Out Iterator (soi).
-
+                for ( OutIt soi { s_t, s_source }; soi.is_valid ( ); ++soi ) { // Source Out Iterator (soi).
                     const Link s_link = s_t.link ( soi );
-
-                    if ( not ( s_visited [ s_link.target ] ) ) {
-
-                        s_visited [ s_link.target ] = true;
+                    if ( not ( s_visited [ s_link.target.value ] ) ) {
+                        s_visited [ s_link.target.value ] = true;
                         s_queue.push ( s_link.target );
-
                         // Now do something. If child in s_mcts_ doesn't exist in t_mcts_, add child.
-
-                        const auto t_it = t_tt.find ( s_itt [ s_link.target ] );
-
+                        const auto t_it = t_tt.find ( s_itt [ s_link.target.value ] );
                         if ( t_it != t_tt.cend ( ) ) { // Child exists. The arc does or does not exist.
-
                             // NodeID t_it->second corresponds to NodeID target child.
-
                             const Link t_link ( t_t.link ( t_source, t_it->second ) );
-
-                            if ( t_link.arc != Tree::invalid_arc ) { // The arc does exist.
-
-                                t_t [ t_link.arc ] += s_t [ s_link.arc ];
+                            if ( Tree::ArcID::invalid != t_link.arc ) { // The arc does exist.
+                                t_t [ t_link.arc.value ] += s_t [ s_link.arc.value ];
                             }
-
                             else { // The arc does not exist.
-
-                                t_t [ t_t.addArcUnsafe ( t_source, t_link.target ).arc ] = std::move ( s_t [ s_link.arc ] );
+                                t_t [ t_t.addArc ( t_source, t_link.target ).arc.value ] = std::move ( s_t [ s_link.arc.value ] );
                             }
-
                             // Update the values of the target.
-
-                            t_t [ t_link.target ] += s_t [ s_link.target ];
+                            t_t [ t_link.target.value ] += s_t [ s_link.target.value ];
                         }
-
                         else { // Child does not exist.
-
-                            const Link t_link = t_t.addNodeUnsafe ( t_source );
-
+                            const Link t_link = t_t.addNode ( t_source );
                             // m_tree.
-
-                            t_t [ t_link.arc    ] = std::move ( s_t [ s_link.arc    ] );
-                            t_t [ t_link.target ] = std::move ( s_t [ s_link.target ] );
-
+                            t_t [ t_link.arc.value    ] = std::move ( s_t [ s_link.arc.value    ] );
+                            t_t [ t_link.target.value ] = std::move ( s_t [ s_link.target.value ] );
                             // m_transposition_table.
-
-                            t_tt.emplace ( s_itt [ s_link.target ], t_link.target );
+                            t_tt.emplace ( s_itt [ s_link.target.value ], t_link.target );
                         }
                     }
                 }
             }
-
             t_mcts_->m_path.resize ( 1 );
             t_mcts_->m_path_size = 1;
-
             delete s_mcts_; // Destruct the smaller tree.
-
             s_mcts_ = nullptr;
         }
 
 
         std::size_t numTranspositions ( ) const noexcept {
             std::size_t nt = 0;
-            typedef boost::dynamic_bitset < > Visited;
-            typedef Stack < NodeID > Stack;
-            Visited visited ( m_tree.nodeNum ( ) );
-            Stack stack ( m_tree.root_node );
-            visited [ m_tree.root_node ] = true;
+            using Visited = boost::dynamic_bitset<>;
+            using Stack = Stack<NodeID>;
+            Visited visited { m_tree.nodeNum ( ) };
+            Stack stack { m_tree.root_node };
+            visited [ m_tree.root_node.value ] = true;
             while ( stack.not_empty ( ) ) {
                 const NodeID parent = stack.pop ( );
-                for ( OutIt a ( m_tree, parent ); a != OutIt::end ( ); ++a ) {
-                    const NodeID child = m_tree.target ( a );
-                    if ( visited [ child ] == false ) {
-                        visited [ child ] = true;
+                for ( OutIt a { m_tree, parent }; a.is_valid ( ); ++a ) {
+                    const NodeID child = a->target;
+                    if ( not ( visited [ child.value ] ) ) {
+                        visited [ child.value ] = true;
                         stack.push ( child );
                         if ( m_tree.inArcNum ( child ) > 1 ) {
                             ++nt;

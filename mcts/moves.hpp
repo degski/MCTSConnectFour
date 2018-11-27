@@ -134,15 +134,15 @@ public:
         }
     }
 
-    template < class Archive >
+    template<class Archive>
     void serialize ( Archive & ar_ ) noexcept {
         ar_ ( m_size );
         ar_ ( cereal::binary_data ( & m_moves, m_size * sizeof ( T ) ) );
     }
 };
 
-template < typename T, index_t S >
+template<typename T, index_t S>
 const index_t Moves < T, S >::s_capacity = S;
 
-template < typename T, index_t S >
-const index_t Moves < T, S >::s_binary_size = sizeof ( Moves < T, S > );
+template<typename T, index_t S>
+const index_t Moves<T, S>::s_binary_size = sizeof ( Moves<T, S> );

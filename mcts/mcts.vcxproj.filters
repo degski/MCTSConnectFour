@@ -29,12 +29,6 @@
     <ClInclude Include="globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graph_adj_vectors.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graph_link_path.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mcts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,6 +48,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="oska.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="autotimer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="flat_search_tree.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="multi_array.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="owningptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="splitmix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

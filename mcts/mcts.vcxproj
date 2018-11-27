@@ -23,16 +23,19 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="autotimer.hpp" />
     <ClInclude Include="connect_four.hpp" />
+    <ClInclude Include="flat_search_tree.hpp" />
     <ClInclude Include="globals.hpp" />
-    <ClInclude Include="graph_adj_vectors.hpp" />
-    <ClInclude Include="graph_link_path.hpp" />
     <ClInclude Include="mcts.hpp" />
     <ClInclude Include="moves.hpp" />
+    <ClInclude Include="multi_array.hpp" />
     <ClInclude Include="oska.hpp" />
+    <ClInclude Include="owningptr.hpp" />
     <ClInclude Include="player.hpp" />
     <ClInclude Include="pool_allocator.hpp" />
     <ClInclude Include="resourcedata.hpp" />
+    <ClInclude Include="splitmix.hpp" />
     <ClInclude Include="types.hpp" />
   </ItemGroup>
   <ItemGroup>
