@@ -45,8 +45,8 @@
 
 #include "types.hpp"
 #include "player.hpp"
+// #include "flat_search_tree.hpp"
 #include "graph_adj_vectors.hpp"
-
 
 namespace mcts {
 
@@ -362,14 +362,13 @@ namespace mcts {
     template < typename State >
     typename NodeData<State>::MovesPoolPtr NodeData<State>::m_moves_pool ( new MovesPool ( ) );
 
-
     template <typename State>
-    using Tree = RootedDiGraphAdjVectors < ArcData<State>, NodeData<State> >;
+    using Tree = RootedDiGraphAdjVectors<ArcData<State>, NodeData<State>>;
 
-    template < typename State >
+    template<typename State>
     using Node = typename Tree<State>::Node;
 
-    template < typename State >
+    template<typename State>
     using Arc = typename Tree<State>::Arc;
 
 
@@ -400,9 +399,9 @@ namespace mcts {
         typedef typename Tree::Link Link;
         typedef typename Tree::Path Path;
 
-        typedef std::unordered_map < ZobristHash, Node > TranspositionTable;
+        typedef std::unordered_map<ZobristHash, Node> TranspositionTable;
         typedef std::vector < ZobristHash > InverseTranspositionTable;
-        typedef llvm::OwningPtr < TranspositionTable > TranspositionTablePtr;
+        typedef llvm::OwningPtr<TranspositionTable> TranspositionTablePtr;
 
         // The data.
 
@@ -427,7 +426,7 @@ namespace mcts {
                 m_transposition_table.reset ( new TranspositionTable ( ) );
             }
             // Set root_node data.
-            m_tree [ m_tree.root_node ] = NodeData ( state_ );
+            m_tree [ m_tree.root_node ] = NodeData { state_ };
             // Add root_node to transposition_table.
             m_transposition_table->emplace ( state_.zobrist ( ), m_tree.root_node );
             // Has been initialized.
