@@ -45,8 +45,8 @@
 
 #include "types.hpp"
 #include "player.hpp"
-// #include "flat_search_tree.hpp"
-#include "graph_adj_vectors.hpp"
+#include "flat_search_tree.hpp"
+// #include "graph_adj_vectors.hpp"
 
 namespace mcts {
 
@@ -363,13 +363,13 @@ namespace mcts {
     typename NodeData<State>::MovesPoolPtr NodeData<State>::m_moves_pool ( new MovesPool ( ) );
 
     template <typename State>
-    using Tree = RootedDiGraphAdjVectors<ArcData<State>, NodeData<State>>;
+    using Tree = fst::SearchTree<ArcData<State>, NodeData<State>>;
 
     template<typename State>
-    using Node = typename Tree<State>::Node;
+    using NodeID = typename Tree<State>::NodeID;
 
     template<typename State>
-    using Arc = typename Tree<State>::Arc;
+    using ArcID = typename Tree<State>::ArcID;
 
 
     template < typename State >
@@ -379,8 +379,8 @@ namespace mcts {
 
         typedef Tree<State> Tree;
 
-        typedef typename Tree::Arc Arc;
-        typedef typename Tree::Node Node;
+        typedef typename Tree::ArcID ArcID;
+        typedef typename Tree::NodeID NodeID;
 
         typedef ArcData<State> ArcData;
         typedef NodeData<State> NodeData;
@@ -399,7 +399,7 @@ namespace mcts {
         typedef typename Tree::Link Link;
         typedef typename Tree::Path Path;
 
-        typedef std::unordered_map<ZobristHash, Node> TranspositionTable;
+        typedef std::unordered_map<ZobristHash, NodeID> TranspositionTable;
         typedef std::vector < ZobristHash > InverseTranspositionTable;
         typedef llvm::OwningPtr<TranspositionTable> TranspositionTablePtr;
 
@@ -431,23 +431,23 @@ namespace mcts {
             m_transposition_table->emplace ( state_.zobrist ( ), m_tree.root_node );
             // Has been initialized.
             m_not_initialized = false;
-            m_path.reset ( m_tree.invalid_arc, m_tree.root_node );
+            m_path.reset ( Tree::ArcID::invalid, m_tree.root_node );
             m_path_size = 1;
         }
 
 
-        [[ nodiscard ]] Link addArc ( const Node parent_, const Node child_, const State & state_ ) noexcept {
+        [[ nodiscard ]] Link addArc ( const NodeID parent_, const NodeID child_, const State & state_ ) noexcept {
             return { m_tree.addArc ( parent_, child_, state_ ), child_ };
         }
 
-        [[ nodiscard ]] Link addNode ( const Node parent_, const State & state_ ) noexcept {
+        [[ nodiscard ]] Link addNode ( const NodeID parent_, const State & state_ ) noexcept {
             const Link link_to_child ( addArc ( parent_, m_tree.addNode ( state_ ), state_ ) );
             m_transposition_table->emplace ( state_.zobrist ( ), link_to_child.target );
             return link_to_child;
         }
 
 
-        void printMoves ( const Node n_ ) const noexcept {
+        void printMoves ( const NodeID n_ ) const noexcept {
             std::cout << "moves of " << ( int ) n_ << ": ";
             for ( OutIt a ( m_tree, n_ ); a != OutIt::end ( ); ++a ) {
                 std::cout << "[" << ( int ) a.get ( ) << ", " << ( int ) m_tree [ a ].m_move.m_loc << "]";
@@ -456,39 +456,39 @@ namespace mcts {
         }
 
 
-        [[ nodiscard ]] Move getMove ( const Arc arc_ ) const noexcept {
+        [[ nodiscard ]] Move getMove ( const ArcID arc_ ) const noexcept {
             return m_tree [ arc_ ].m_move;
         }
 
-        [[ nodiscard ]] Node getNode ( const ZobristHash zobrist_ ) const noexcept {
+        [[ nodiscard ]] NodeID getNode ( const ZobristHash zobrist_ ) const noexcept {
             const auto it = m_transposition_table->find ( zobrist_ );
-            return it == m_transposition_table->cend ( ) ? Tree::invalid_node : it->second;
+            return it == m_transposition_table->cend ( ) ? Tree::NodeID::invalid : it->second;
         }
 
 
-        [[ nodiscard ]] bool hasChildren ( const Node node_ ) const noexcept {
+        [[ nodiscard ]] bool hasChildren ( const NodeID node_ ) const noexcept {
             return m_tree.isInternal ( node_ );
         }
 
 
         // Moves.
 
-        [[ nodiscard ]] bool hasNoUntriedMoves ( const Node node_ ) const noexcept {
+        [[ nodiscard ]] bool hasNoUntriedMoves ( const NodeID node_ ) const noexcept {
             return m_tree [ node_ ].m_moves == nullptr;
         }
 
-        [[ nodiscard ]] bool hasUntriedMoves ( const Node node_ ) const noexcept {
+        [[ nodiscard ]] bool hasUntriedMoves ( const NodeID node_ ) const noexcept {
             return m_tree [ node_ ].m_moves != nullptr;
         }
 
-        [[ nodiscard ]] Move getUntriedMove ( const Node node_ ) noexcept {
+        [[ nodiscard ]] Move getUntriedMove ( const NodeID node_ ) noexcept {
             return m_tree [ node_ ].getUntriedMove ( );
         }
 
 
         // Data.
 
-        [[ nodiscard ]] std::int32_t getVisits ( const Node node_ ) const noexcept {
+        [[ nodiscard ]] std::int32_t getVisits ( const NodeID node_ ) const noexcept {
             std::int32_t visits = 0;
             for ( InIt a ( m_tree, node_ ); a != InIt::end ( ); ++a ) {
                 visits += m_tree [ a ].m_visits;
@@ -497,7 +497,7 @@ namespace mcts {
         }
 
 
-        [[ nodiscard ]] float getUCTFromArcs ( const Node parent_, const Node child_ ) const noexcept {
+        [[ nodiscard ]] float getUCTFromArcs ( const NodeID parent_, const NodeID child_ ) const noexcept {
             ArcData child_data;
             for ( InIt a ( m_tree, child_ ); a != InIt::end ( ); ++a ) {
                 child_data += m_tree [ a ];
@@ -513,7 +513,7 @@ namespace mcts {
         }
 
 
-        [[ nodiscard ]] float getUCTFromNode ( const Node parent_, const Node child_ ) const noexcept {
+        [[ nodiscard ]] float getUCTFromNode ( const NodeID parent_, const NodeID child_ ) const noexcept {
             //                              Exploitation                                                             Exploration
             // Exploitation is the task to select the move that leads to the best results so far.
             // Exploration deals with less promising moves that still have to be examined, due to the uncertainty of the evaluation.
@@ -521,7 +521,7 @@ namespace mcts {
         }
 
 
-        [[ nodiscard ]] Link selectChildRandom ( const Node parent_ ) const noexcept {
+        [[ nodiscard ]] Link selectChildRandom ( const NodeID parent_ ) const noexcept {
             boost::container::static_vector<Link, State::max_no_moves> children;
             for ( OutIt a ( m_tree, parent_ ); a != OutIt::end ( ); ++a ) {
                 children.emplace_back ( m_tree.link ( a ) );
@@ -530,12 +530,12 @@ namespace mcts {
         }
 
 
-        [[ nodiscard ]] Link selectChildUCT ( const Node parent_ ) const noexcept {
-            cOutIt a = m_tree.cbeginOut ( parent_ ), end = m_tree.cendOut ( parent_ );
+        [[ nodiscard ]] Link selectChildUCT ( const NodeID parent_ ) const noexcept {
+            cOutIt a = m_tree.cbeginOut ( parent_ );
             boost::container::static_vector < Link, State::max_no_moves > best_children ( 1, m_tree.link ( a ) );
             float best_UCT_score = getUCTFromNode ( parent_, best_children.back ( ).target );
             ++a;
-            for ( ; a != end; ++a ) {
+            for ( ; a.is_valid ( ); ++a ) {
                 const Link child = m_tree.link ( a );
                 const float UCT_score = getUCTFromNode ( parent_, child.target );
                 if ( UCT_score > best_UCT_score ) {
@@ -553,9 +553,9 @@ namespace mcts {
 
 
         // State is updated to reflect move.
-        [[ nodiscard ]] Link addChild ( const Node parent_, const State & state_ ) noexcept {
-            const Node child = getNode ( state_.zobrist ( ) );
-            return child == Tree::invalid_node ? addNode ( parent_, state_ ) : addArc ( parent_, child, state_ );
+        [[ nodiscard ]] Link addChild ( const NodeID parent_, const State & state_ ) noexcept {
+            const NodeID child = getNode ( state_.zobrist ( ) );
+            return child == Tree::NodeID::invalid ? addNode ( parent_, state_ ) : addArc ( parent_, child, state_ );
         }
 
 
@@ -572,9 +572,9 @@ namespace mcts {
         [[ nodiscard ]] Move getBestMove ( ) noexcept {
             std::int32_t best_child_visits = INT_MIN;
             Move best_child_move = State::Move::none;
-            m_path.push ( Tree::invalid_arc, Tree::invalid_node );
+            m_path.push ( Tree::ArcID::invalid, Tree::NodeID::invalid );
             ++m_path_size;
-            for ( cOutIt a ( m_tree.cbeginOut ( m_tree.root_node ) ); a != m_tree.cendOut ( m_tree.root_node ); ++a ) {
+            for ( cOutIt a ( m_tree.cbeginOut ( m_tree.root_node ) ); a.is_valid ( ); ++a ) {
                 const Link child ( m_tree.link ( a ) );
                 const std::int32_t child_visits ( m_tree [ child.target ].m_visits );
                 if ( child_visits > best_child_visits ) {
@@ -589,8 +589,8 @@ namespace mcts {
 
         // Adding the move of the opponent to the path (and possibly to the tree).
         void connectStatesPath ( const State & state_ ) noexcept {
-            const Node parent = m_path.back ( ).target; Node child = getNode ( state_.zobrist ( ) );
-            if ( child == Tree::invalid_node ) {
+            const NodeID parent = m_path.back ( ).target; NodeID child = getNode ( state_.zobrist ( ) );
+            if ( child == Tree::NodeID::invalid ) {
                 child = addNode ( parent, state_ ).target;
             }
             m_path.push ( m_tree.link ( parent, child ) );
@@ -620,7 +620,7 @@ namespace mcts {
 
             while ( max_iterations_-- > 0 ) {
 
-                Node node = m_tree.root_node;
+                NodeID node = m_tree.root_node;
                 State state ( state_ );
 
                 // Select a path through the tree to a leaf node.
@@ -715,19 +715,19 @@ namespace mcts {
 
         void prune_impl ( Mcts * new_mcts_, const State & state_ ) noexcept {
             // at::AutoTimer t ( at::milliseconds );
-            typedef pector < Node > Visited; // New m_nodes by old_index.
-            typedef Queue < Node > Queue;
+            typedef pector < NodeID > Visited; // New m_nodes by old_index.
+            typedef Queue < NodeID > Queue;
             // Prune Tree.
-            const Node old_node = getNode ( state_.zobrist ( ) [ 0 ] );
+            const NodeID old_node = getNode ( state_.zobrist ( ) [ 0 ] );
             Visited visited ( m_tree.nodeNum ( ), Tree::invalid_node );
             visited [ old_node ] = m_tree.root_node;
             Queue queue ( old_node );
             Tree & new_tree = new_mcts_->m_tree;
             new_tree [ m_tree.root_node ] = std::move ( m_tree [ old_node ] );
             while ( queue.not_empty ( ) ) {
-                const Node parent = queue.pop ( );
+                const NodeID parent = queue.pop ( );
                 for ( OutIt a ( m_tree, parent ); a != OutIt::end ( ); ++a ) {
-                    const Node child = m_tree.target ( a );
+                    const NodeID child = m_tree.target ( a );
                     if ( visited [ child ] == Tree::invalid_node ) { // Not visited yet.
                         const Link link = new_tree.addNodeUnsafe ( visited [ parent ] );
                         visited [ child ] = link.target;
@@ -746,7 +746,7 @@ namespace mcts {
             while ( it != it_cend ) {
                 const auto tmp_it = it;
                 ++it;
-                const Node new_node = visited [ tmp_it->second ];
+                const NodeID new_node = visited [ tmp_it->second ];
                 if ( new_node == Tree::invalid_node ) {
                     m_transposition_table->erase ( tmp_it );
                 }
@@ -777,11 +777,11 @@ namespace mcts {
 
         static void reset ( Mcts * & mcts_, const State & state_, const Player player_ ) noexcept {
             if ( not ( mcts_->m_not_initialized ) ) {
-                const Mcts::Node new_root_node = mcts_->getNode ( state_.zobrist ( ) );
-                if ( new_root_node != Mcts::Tree::invalid_node ) {
+                const Mcts::NodeID new_root_node = mcts_->getNode ( state_.zobrist ( ) );
+                if ( new_root_node != Mcts::Tree::NodeID::invalid ) {
                     // The state exists in the tree and it's not the current
                     // root_node, i.e. re-hang the tree.
-                    mcts_->m_tree.setRoot ( new_root_node );
+                    mcts_->m_tree.root_node = new_root_node;
                 }
                 else {
                     std::cout << "new tree\n";
@@ -828,7 +828,7 @@ namespace mcts {
             // bfs help structures.
 
             typedef boost::dynamic_bitset < > Visited;
-            typedef Queue < Node > Queue;
+            typedef Queue < NodeID > Queue;
 
             Visited s_visited ( s_t.nodeNum ( ) );
             Queue s_queue ( s_t.root_node );
@@ -841,7 +841,7 @@ namespace mcts {
 
                 // The t_source (target parent) does always exist, as we are going at it breadth first.
 
-                const Node s_source = s_queue.pop ( ), t_source = t_tt.find ( s_itt [ s_source ] )->second;
+                const NodeID s_source = s_queue.pop ( ), t_source = t_tt.find ( s_itt [ s_source ] )->second;
 
                 // Iterate over children (targets) of the parent (source).
 
@@ -860,7 +860,7 @@ namespace mcts {
 
                         if ( t_it != t_tt.cend ( ) ) { // Child exists. The arc does or does not exist.
 
-                            // Node t_it->second corresponds to Node target child.
+                            // NodeID t_it->second corresponds to NodeID target child.
 
                             const Link t_link ( t_t.link ( t_source, t_it->second ) );
 
@@ -908,14 +908,14 @@ namespace mcts {
         std::size_t numTranspositions ( ) const noexcept {
             std::size_t nt = 0;
             typedef boost::dynamic_bitset < > Visited;
-            typedef Stack < Node > Stack;
+            typedef Stack < NodeID > Stack;
             Visited visited ( m_tree.nodeNum ( ) );
             Stack stack ( m_tree.root_node );
             visited [ m_tree.root_node ] = true;
             while ( stack.not_empty ( ) ) {
-                const Node parent = stack.pop ( );
+                const NodeID parent = stack.pop ( );
                 for ( OutIt a ( m_tree, parent ); a != OutIt::end ( ); ++a ) {
-                    const Node child = m_tree.target ( a );
+                    const NodeID child = m_tree.target ( a );
                     if ( visited [ child ] == false ) {
                         visited [ child ] = true;
                         stack.push ( child );

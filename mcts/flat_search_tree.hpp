@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "detail/singleton.hpp"
-#include "detail/types.hpp"
-#include "detail/transition.hpp"
-#include "detail/path.hpp"
-#include "detail/flat_search_tree.hpp"
+#include "Y:/REPOS/MCTSSearchTree/include/singleton.hpp"
+#include "Y:/REPOS/MCTSSearchTree/include/types.hpp"
+#include "Y:/REPOS/MCTSSearchTree/include/link.hpp"
+#include "Y:/REPOS/MCTSSearchTree/include/path.hpp"
+#include "Y:/REPOS/MCTSSearchTree/include/flat_search_tree.hpp"
