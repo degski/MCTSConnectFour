@@ -27,12 +27,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "types.hpp"
+#include "Typedefs.hpp"
 
 #include "resource.h"
-
-
-enum class Screen : std::int32_t { SMALL, MEDIUM, LARGE };
 
 
 template < std::int32_t S >

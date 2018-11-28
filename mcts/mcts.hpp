@@ -44,7 +44,7 @@
 
 #include "autotimer.hpp"
 
-#include "types.hpp"
+#include "Typedefs.hpp"
 #include "player.hpp"
 #include "flat_search_tree.hpp"
 

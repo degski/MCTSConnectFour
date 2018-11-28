@@ -33,8 +33,8 @@
 
 #include "multi_array.hpp"
 
-#include "globals.hpp"
-#include "types.hpp"
+#include "Globals.hpp"
+#include "Typedefs.hpp"
 #include "player.hpp"
 #include "moves.hpp"
 

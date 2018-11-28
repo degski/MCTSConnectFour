@@ -26,9 +26,6 @@
     <ClInclude Include="connect_four.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="globals.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mcts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,15 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pool_allocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="types.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resourcedata.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="oska.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="autotimer.hpp">
@@ -63,6 +51,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="splitmix.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Oska.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Typedefs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceData.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Oska1.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Oska2.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

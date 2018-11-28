@@ -29,8 +29,8 @@
 
 #include <cereal/cereal.hpp>
 
-#include "types.hpp"
-#include "globals.hpp"
+#include "Typedefs.hpp"
+#include "Globals.hpp"
 
 
 class Player {

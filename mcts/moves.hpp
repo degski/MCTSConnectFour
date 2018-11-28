@@ -31,8 +31,8 @@
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 
-#include "types.hpp"
-#include "globals.hpp"
+#include "Typedefs.hpp"
+#include "Globals.hpp"
 
 
 template<typename T, index_t S>

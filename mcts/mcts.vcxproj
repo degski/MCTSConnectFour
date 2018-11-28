@@ -26,17 +26,19 @@
     <ClInclude Include="autotimer.hpp" />
     <ClInclude Include="connect_four.hpp" />
     <ClInclude Include="flat_search_tree.hpp" />
-    <ClInclude Include="globals.hpp" />
+    <ClInclude Include="Globals.hpp" />
     <ClInclude Include="mcts.hpp" />
     <ClInclude Include="moves.hpp" />
     <ClInclude Include="multi_array.hpp" />
-    <ClInclude Include="oska.hpp" />
+    <ClInclude Include="Oska.hpp" />
+    <ClInclude Include="Oska1.hpp" />
+    <ClInclude Include="Oska2.hpp" />
+    <ClInclude Include="Typedefs.hpp" />
     <ClInclude Include="owningptr.hpp" />
     <ClInclude Include="player.hpp" />
     <ClInclude Include="pool_allocator.hpp" />
-    <ClInclude Include="resourcedata.hpp" />
+    <ClInclude Include="ResourceData.hpp" />
     <ClInclude Include="splitmix.hpp" />
-    <ClInclude Include="types.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE.md" />

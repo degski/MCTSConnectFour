@@ -30,17 +30,17 @@
 
 #include "autotimer.hpp"
 
-#include "types.hpp"
-#include "globals.hpp"
+#include "Typedefs.hpp"
+#include "Globals.hpp"
 #include "player.hpp"
-#include "moves.hpp"
+#include "Moves.hpp"
 
 #define CF 0
 
 #if CF
 #include "connect_four.hpp"
 #else
-#include "oska.hpp"
+#include "Oska.hpp"
 #endif
 
 #include "mcts.hpp"

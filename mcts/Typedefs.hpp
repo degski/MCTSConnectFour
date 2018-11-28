@@ -21,21 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <SFML/Graphics.hpp>
+#pragma once
 
-#include "oska.hpp"
+#include <cstdint>
+#include <boost/uuid/uuid.hpp>
 
+using index_t = std::int32_t;
+using UserId = boost::uuids::uuid;
+using ZobristHash = std::size_t;
 
-const Move Move::none = Move ( Location ( -1, -1 ), Location ( -1, -1 ) );
-const Move Move::root = Move ( Location ( -2, -2 ), Location ( -2, -2 ) );
-const Move Move::invalid; // Initialized to Move ( Location ( -3, -3 ), Location ( -3, -3 ) );
-/*
-float Hexagon::m_hori;
-float Hexagon::m_vert;
-float Hexagon::m_2_vert;
-float Hexagon::m_2_vert_hori;
-float Hexagon::m_center_l2radius;
+enum class Screen : std::int32_t { SMALL, MEDIUM, LARGE };
 
-std::normal_distribution<float> Hexagon::m_disx;
-std::normal_distribution<float> Hexagon::m_disy;
-*/
+#include <pector/pector.h>
+#include <pector/malloc_allocator.h>
+
+template<typename T>
+using pector = pt::pector<T, pt::malloc_allocator<T, true, true>, std::uint32_t, pt::default_recommended_size, false>;
