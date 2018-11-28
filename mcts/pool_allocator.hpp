@@ -21,15 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
+// This code started of as a fork of https://github.com/cacay/MemoryPool, by
+// Josh Acay, http://www.coskuacay.com, was thereafter modified beyond all
+// recognition, the source was a great insiration.
+
 #pragma once
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstdint>
+#include <Windows.h>
 
 #include <cassert>
 #include <climits>
 #include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 #include <memory>
 #include <type_traits>
@@ -100,7 +106,7 @@ namespace pa {
 
             union Slot;
 
-            using DataPtr = char*;
+            using DataPtr = std::byte*;
             using SlotType = Slot;
             using SlotPointer = Slot*;
             using SlotPtrVector = std::vector<SlotPointer>;
@@ -122,11 +128,11 @@ namespace pa {
             void allocate_block ( );
             SlotPointer first_slot ( const SlotPointer block_ ) const noexcept;
             SlotPointer last_slot ( const SlotPointer block_ ) const noexcept;
-            SlotPtrVector pointer_vector ( SlotPointer sp_ ) const noexcept;
+            inline SlotPtrVector pointer_vector ( SlotPointer sp_ ) const noexcept;
             SlotPtrVector block_vector ( ) const noexcept;
 
-            SlotPointer virtual_alloc ( const size_type size_ ) const noexcept;
-            void virtual_free ( const SlotPointer block_ ) const noexcept;
+            inline SlotPointer virtual_alloc ( const size_type size_ ) const noexcept;
+            inline void virtual_free ( const SlotPointer block_ ) const noexcept;
         };
 
 
