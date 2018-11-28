@@ -41,7 +41,7 @@
 
 struct Move { // 1
 
-	typedef int8_t type;
+	typedef std::int8_t type;
 
 	static const Move none;
 	static const Move root;
@@ -103,10 +103,10 @@ private:
 
 	// 16 + 42 + 1 + 1 + 1 + 1 + 2 = 64 bytes...
 
-	ZobristHash m_zobrist_hash = m_zobrist_player_keys [ ( index_t ) Player::type::vacant ]; // Hash of the current m_board...
+	ZobristHash m_zobrist_hash = m_zobrist_player_keys [ ( index_t ) Player::Type::vacant ]; // Hash of the current m_board...
 	Board m_board;
 	uint8_t m_no_moves = 0; // Records last move...
-	Player m_player_just_moved = Player::random ( ), m_winner = Player::type::invalid; // Human starts...
+	Player m_player_just_moved = Player::random ( ), m_winner = Player::Type::invalid; // Human starts...
 	Move m_move = Move::root;
 	uint8_t _padding [ 2 ] = { 0, 0 };
 
@@ -121,10 +121,10 @@ public:
 
 	void initialize ( ) noexcept {
 
-		m_zobrist_hash = m_zobrist_player_keys [ ( index_t ) Player::type::vacant ];
+		m_zobrist_hash = m_zobrist_player_keys [ ( index_t ) Player::Type::vacant ];
 		m_no_moves = 0;
 		m_player_just_moved = Player::random ( );
-		m_winner = Player::type::invalid;
+		m_winner = Player::Type::invalid;
 		m_move = Move::root;
 		memset ( _padding, 0, sizeof ( _padding ) );
 	}
@@ -234,7 +234,7 @@ public:
 
 		if ( NumRows * NumCols == m_no_moves ) {
 
-			m_winner = Player::type::vacant;
+			m_winner = Player::Type::vacant;
 		}
 	}
 
@@ -297,7 +297,7 @@ public:
 
 		m_->clear ( );
 
-		if ( NumRows * NumCols == m_no_moves or m_winner != Player::type::invalid ) {
+		if ( NumRows * NumCols == m_no_moves or m_winner != Player::Type::invalid ) {
 
 			return false;
 		}
@@ -337,7 +337,7 @@ public:
 
 	std::optional<Player> ended ( ) const noexcept {
 
-		return m_winner == Player::type::invalid ? std::optional<Player> ( ) : std::optional<Player> ( m_winner );
+		return m_winner == Player::Type::invalid ? std::optional<Player> ( ) : std::optional<Player> ( m_winner );
 	}
 
 

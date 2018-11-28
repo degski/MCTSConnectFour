@@ -64,15 +64,15 @@ int wmain ( ) {
             Mcts * mcts_agent = new Mcts ( ), * mcts_human = new Mcts ( );
             match_start = now ( );
             do {
-                state.move_hash_winner ( state.playerToMove ( ) == Player::type::agent ? mcts_agent->compute ( state, 20'000 ) : mcts_human->compute ( state, 2'000 ) );
-                Mcts::prune ( state.playerToMove ( ) == Player::type::agent ? mcts_agent : mcts_human, state );
+                state.move_hash_winner ( state.playerToMove ( ) == Player::Type::agent ? mcts_agent->compute ( state, 20'000 ) : mcts_human->compute ( state, 2'000 ) );
+                Mcts::prune ( state.playerToMove ( ) == Player::Type::agent ? mcts_agent : mcts_human, state );
             } while ( not ( winner = state.ended ( ) ) );
 #if 0
             state.print ( );
-            if ( winner.get ( ) == Player::type::agent ) {
+            if ( winner.get ( ) == Player::Type::agent ) {
                 std::wcout << L" Winner: Agent\n";
             }
-            else if ( winner.get ( ) == Player::type::human ) {
+            else if ( winner.get ( ) == Player::Type::human ) {
                 std::wcout << L" Winner: Human\n";
             }
             else {
@@ -87,8 +87,8 @@ int wmain ( ) {
         elapsed += since ( match_start );
         ++matches;
         switch ( winner->as_index ( ) ) {
-            case ( index_t ) Player::type::agent: ++agent_wins; break;
-            case ( index_t ) Player::type::human: ++human_wins; break;
+            case ( index_t ) Player::Type::agent: ++agent_wins; break;
+            case ( index_t ) Player::Type::human: ++human_wins; break;
             NO_DEFAULT_CASE;
         }
         float a = ( 1000.0f * agent_wins ) / float ( agent_wins + human_wins );

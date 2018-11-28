@@ -35,24 +35,24 @@
 
 class Player {
 
-	typedef int8_t underlying_t;
+	typedef std::int8_t underlying_t;
 
 public:
 
-	enum class type : underlying_t { invalid = -2, agent = -1, vacant = 0, human = 1 }; // Keep numbering this way...
+	enum class Type : underlying_t { invalid = -2, agent = -1, vacant = 0, human = 1 }; // Keep numbering this way...
 
 private:
 
-	type m_value = type::vacant;
+	Type m_value = Type::vacant;
 
 public:
 
 	Player ( ) noexcept { }
-	Player ( const type p_ ) noexcept : m_value ( p_ ) { }
+	Player ( const Type p_ ) noexcept : m_value ( p_ ) { }
 
-	type opponent ( ) const noexcept {
+	Type opponent ( ) const noexcept {
 
-		return ( type ) -( ( underlying_t ) m_value );
+		return ( Type ) -( ( underlying_t ) m_value );
 	}
 
 	void next ( ) noexcept {
@@ -60,7 +60,7 @@ public:
 		m_value = opponent ( );
 	}
 
-	type get ( ) const noexcept {
+	Type get ( ) const noexcept {
 
 		return m_value;
 	}
@@ -74,36 +74,36 @@ public:
 
 		switch ( as_index ( ) ) {
 
-			case ( index_t ) type::agent: return ( index_t ) 0;
-			case ( index_t ) type::human: return ( index_t ) 1;
+			case ( index_t ) Type::agent: return ( index_t ) 0;
+			case ( index_t ) Type::human: return ( index_t ) 1;
 
 			NO_DEFAULT_CASE;
 		}
 	}
 
-	static type random ( ) noexcept {
+	static Type random ( ) noexcept {
 
-		return bernoulli ( ) ? type::agent : type::human;
+		return bernoulli ( ) ? Type::agent : Type::human;
 	}
 
 	bool invalid ( ) const noexcept {
 
-		return m_value == type::invalid;
+		return m_value == Type::invalid;
 	}
 
 	bool agent ( ) const noexcept {
 
-		return m_value == type::agent;
+		return m_value == Type::agent;
 	}
 
 	bool vacant ( ) const noexcept {
 
-		return m_value == type::vacant;
+		return m_value == Type::vacant;
 	}
 
 	bool human ( ) const noexcept {
 
-		return m_value == type::human;
+		return m_value == Type::human;
 	}
 
 	bool occupied ( ) const noexcept {
@@ -115,10 +115,10 @@ public:
 
 		switch ( m_value ) {
 
-			case type::invalid:	std::puts ( "invalid" );	break;
-			case type::agent:	std::puts ( "agent" );		break;
-			case type::vacant:	std::puts ( "vacant" );		break;
-			case type::human:	std::puts ( "human" );		break;
+			case Type::invalid:	std::puts ( "invalid" );	break;
+			case Type::agent:	std::puts ( "agent" );		break;
+			case Type::vacant:	std::puts ( "vacant" );		break;
+			case Type::human:	std::puts ( "human" );		break;
 
 			NO_DEFAULT_CASE;
 		}

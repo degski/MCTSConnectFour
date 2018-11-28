@@ -30,6 +30,7 @@
 #include <iostream>
 #include <random>
 #include <unordered_map>
+#include <vector>
 
 #include <boost/dynamic_bitset.hpp>
 #include <boost/container/static_vector.hpp>
@@ -50,20 +51,21 @@
 
 namespace mcts {
 
-    template<typename T, uindex_t N = 128>
+    template<typename T>
     class Stack {
 
-        pector<T> m_data;
+        std::vector<T> m_data;
 
     public:
 
-        Stack ( const T & v_ ) noexcept {
-            m_data.reserve ( N );
+        explicit Stack ( const T & v_ ) noexcept {
             m_data.push_back ( v_ );
         }
 
-        [[ nodiscard ]] const T pop ( ) noexcept {
-            return m_data.pop ( );
+        [[ nodiscard ]] T pop ( ) noexcept {
+            const T v { m_data.back ( ) };
+            m_data.pop_back ( );
+            return v;
         }
 
         void push ( const T & v_ ) noexcept {
@@ -83,7 +85,7 @@ namespace mcts {
 
     public:
 
-        Queue ( const T & v_ ) noexcept {
+        explicit Queue ( const T & v_ ) noexcept {
             m_data.push_back ( v_ );
         }
 
@@ -176,14 +178,12 @@ namespace mcts {
         using Moves = typename State::Moves;
         using Move = typename State::Moves::value_type;
         using MovesPool = pa::pool_allocator<Moves>;
-        using MovesPoolPtr = llvm::OwningPtr <MovesPool>;
+        using MovesPoolPtr = llvm::OwningPtr<MovesPool>;
 
         Moves * m_moves = nullptr;  // 8 bytes.
-
         float m_score = 0.0f; // 4 bytes.
         std::int32_t m_visits = 0; // 4 bytes.
-
-        Player m_player_just_moved = Player::type::invalid; // 1 byte.
+        Player m_player_just_moved = Player::Type::invalid; // 1 byte.
 
         // Constructors.
 
@@ -202,7 +202,7 @@ namespace mcts {
         NodeData ( const NodeData & nd_ ) noexcept {
             // std::cout << "nodedata copy constructed\n";
             if ( nd_.m_moves != nullptr ) {
-                m_moves = m_moves_pool->new_element ( *nd_.m_moves );
+                m_moves = m_moves_pool->new_element ( * nd_.m_moves );
             }
             m_score = nd_.m_score;
             m_visits = nd_.m_visits;
@@ -222,6 +222,7 @@ namespace mcts {
 
         [[ nodiscard ]] Move getUntriedMove ( ) noexcept {
             if ( 1 == m_moves->size ( ) ) {
+                // 1 move left, so destroy memory and return that 1 move.
                 const Move move = m_moves->front ( );
                 m_moves_pool->delete_element ( m_moves );
                 m_moves = nullptr;
@@ -238,8 +239,8 @@ namespace mcts {
 
         [[ maybe_unused ]] NodeData & operator = ( const NodeData & nd_ ) noexcept {
             // std::cout << "nodedata copy assigned\n";
-            if ( nd_.m_moves != nullptr ) {
-                m_moves = m_moves_pool->new_element ( *nd_.m_moves );
+            if ( nullptr != nd_.m_moves ) {
+                m_moves = m_moves_pool->new_element ( * nd_.m_moves );
             }
             m_score = nd_.m_score;
             m_visits = nd_.m_visits;
@@ -264,13 +265,13 @@ namespace mcts {
 
         template < class Archive >
         void save ( Archive & ar_ ) const noexcept {
-            if ( m_moves != nullptr ) {
-                const int8_t tmp = 2;
+            if ( nullptr != m_moves ) {
+                const std::int8_t tmp = 2;
                 ar_ ( tmp );
                 m_moves->serialize ( ar_ );
             }
             else {
-                const int8_t tmp = 1;
+                const std::int8_t tmp = 1;
                 ar_ ( tmp );
             }
             ar_ ( m_score, m_visits, m_player_just_moved );
@@ -278,9 +279,9 @@ namespace mcts {
 
         template < class Archive >
         void load ( Archive & ar_ ) noexcept {
-            int8_t tmp = -1;
+            std::int8_t tmp = -1;
             ar_ ( tmp );
-            if ( tmp == 2 ) {
+            if ( 2 == tmp ) {
                 m_moves = m_moves_pool->new_element ( );
                 m_moves->serialize ( ar_ );
             }
@@ -540,7 +541,7 @@ namespace mcts {
             }
 
             // const Player player = state_.playerToMove ( );
-            // if ( player == Player::type::agent ) {
+            // if ( player == Player::Type::agent ) {
                 // m_path.print ( );
             // }
 
@@ -579,7 +580,7 @@ namespace mcts {
                 // children of a node when a node's visit count equals T
 
                 if ( hasUntriedMoves ( node ) ) {
-                    // if ( player == Player::type::agent and m_tree [ node ].m_visits < threshold )
+                    // if ( player == Player::Type::agent and m_tree [ node ].m_visits < threshold )
                     state.move_hash_winner ( getUntriedMove ( node ) ); // State update.
                     m_path.push ( addChild ( node, state ) );
                 }
@@ -587,7 +588,7 @@ namespace mcts {
                 // The player in back of path is player ( the player to move ).We now play
                 // randomly until the game ends.
 
-                // if ( player == Player::type::human ) {
+                // if ( player == Player::Type::human ) {
                     // state.simulate ( );
                     // for ( Link & link : m_path ) {
                         // We have now reached a final state. Backpropagate the result up the
