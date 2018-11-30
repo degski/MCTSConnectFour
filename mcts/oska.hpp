@@ -237,7 +237,7 @@ public:
 
 private:
 
-    static std::normal_distribution < float > m_disx, m_disy;
+    static std::normal_distribution<float> m_disx, m_disy;
 
 public:
 
@@ -252,8 +252,8 @@ public:
         m_hori = 0.5f * d_.x, m_vert = 0.25f * d_.y;
         m_2_vert = 2.0f * m_vert, m_2_vert_hori = 2.0f * m_vert * m_hori;
         m_center_l2radius = ( ( 2.0f / 3.0f ) * ( 2.0f / 3.0f ) ) * m_vert * m_vert;
-        m_disx = std::normal_distribution < float > ( 0.0f, 0.25f * std::sqrt ( d_.x ) );
-        m_disy = std::normal_distribution < float > ( 0.0f, 0.25f * std::sqrt ( d_.y ) );
+        m_disx = std::normal_distribution<float> ( 0.0f, 0.25f * std::sqrt ( d_.x ) );
+        m_disy = std::normal_distribution<float> ( 0.0f, 0.25f * std::sqrt ( d_.y ) );
     }
 
     [[ nodiscard ]] bool contains ( const Point & p_ ) const noexcept {
